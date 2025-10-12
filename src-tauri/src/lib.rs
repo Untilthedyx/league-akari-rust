@@ -2,11 +2,11 @@ pub mod client;
 pub mod error;
 pub mod utils;
 
-use client::detector::detect_league;
+use client::detect::is_running;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
-    let flag = detect_league();
+    let flag = is_running();
     format!("Hello, {}! You've been greeted from Rust!, {}", name, flag)
 }
 

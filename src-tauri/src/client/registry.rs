@@ -3,6 +3,7 @@ use std::path::Path;
 use winreg::enums::*;
 use winreg::RegKey;
 
+/// 从注册表检索英雄联盟的安装路径
 pub fn get_lol_paths() -> Result<(String, String), LolPathError> {
     let possible_reg_paths = [
         (HKEY_CURRENT_USER, "Software\\Tencent\\LOL"),
