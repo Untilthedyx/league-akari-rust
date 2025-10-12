@@ -12,7 +12,7 @@ pub fn is_running() -> bool {
 }
 
 /// 获取客户端信息
-fn get_client_info() -> Result<CommandInfo, String> {
+pub fn get_client_info() -> Result<CommandInfo, String> {
     let pids = get_process_pid_by_name("LeagueClientUx.exe")?;
 
     if pids.is_empty() {

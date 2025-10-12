@@ -4,21 +4,32 @@ import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
+  const [greetMsg, setGreetMsg] = useState(false);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name: "Tauri" }));
+  async function fetchClientInfo() {
+    try {
+      const result: any = await invoke("_get_client_info");
+      console.log("获取到的客户端信息:", result);
+    } catch (error) {
+      console.error("调用失败:", error);
+    }
   }
 
+  // 修正后的代码
   useEffect(() => {
-    const timer = setInterval(() => {
-      greet();
+    const timer = setInterval(async () => {
+      // 直接使用invoke的返回值，而不是依赖状态
+      const isRunning: boolean = await invoke("_is_running");
+      setGreetMsg(isRunning);
+
+      console.log("当前状态:", isRunning);
+      if (isRunning) {
+        fetchClientInfo();
+      }
     }, 1000);
 
-    // 组件卸载时清除定时器
     return () => clearInterval(timer);
-  }, []); // 空依赖数组表示只在组件挂载时执行一次
+  }, []); // 仍然保持空依赖，因为我们不再依赖greetMsg
 
   return (
     <main className="container">

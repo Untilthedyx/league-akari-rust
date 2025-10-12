@@ -4,6 +4,8 @@ use winapi::shared::ntdef::{NTSTATUS, UNICODE_STRING};
 use winapi::um::handleapi::{CloseHandle, INVALID_HANDLE_VALUE};
 use winapi::um::winnt::{HANDLE, PROCESS_QUERY_LIMITED_INFORMATION};
 
+use serde::{Serialize, Deserialize};
+
 /// 获取进程快照
 use winapi::um::tlhelp32::{
     CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W, TH32CS_SNAPPROCESS,
@@ -102,7 +104,7 @@ pub fn get_process_command_line(pid: DWORD) -> Result<String, String> {
         }
         let _process_handle = ProcessHandle(handle);
 
-        let initial_size = 8192u32;
+        let initial_size = 8192u32; // 我这里实际为 2670u32
         let mut buffer: Vec<BYTE> = vec![0; initial_size as usize]; // 申请内存
         let mut return_size: DWORD = 0;
 
@@ -131,7 +133,7 @@ pub fn get_process_command_line(pid: DWORD) -> Result<String, String> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommandInfo {
     pub port: u32,
     pub pid: u32,
