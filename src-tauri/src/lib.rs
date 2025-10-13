@@ -1,6 +1,7 @@
 pub mod client;
 pub mod error;
 pub mod utils;
+pub mod lcu;
 
 use client::commandinfo::CommandInfo;
 use client::detect::get_client_info;
