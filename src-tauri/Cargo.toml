@@ -45,3 +45,7 @@ base64 = "0.22.1"
 urlencoding = "2.1.3"
 phf = { version = "0.13.1", features = ["macros"] }
 tokio = { version = "1.47.1", features = ["full"] }
+serde_yaml = "0.9.34"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3", features = ["fmt", "json", "local-time"] }
+async-trait = "0.1.89"

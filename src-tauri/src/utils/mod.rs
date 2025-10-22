@@ -1,4 +1,4 @@
 pub mod process;
-
-#[cfg(test)]
-mod tests;
+pub mod error;
+pub mod log;
+pub mod config;
