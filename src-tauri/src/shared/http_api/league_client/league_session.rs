@@ -2,11 +2,11 @@ use crate::{
     shared::http_api::league_client::httpclient::HttpClient, utils::error::http_error::HttpError,
 };
 
-pub struct HonorHttpApi {
+pub struct LeagueSessionHttpApi {
     client: HttpClient,
 }
 
-impl HonorHttpApi {
+impl LeagueSessionHttpApi {
     pub fn new(client: HttpClient) -> Self {
         Self { client }
     }
