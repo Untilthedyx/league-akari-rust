@@ -106,9 +106,9 @@ pub struct LeagueClientHttpApiAxiosHelper {
 }
 
 impl LeagueClientHttpApiAxiosHelper {
+    /// reqwest::Client 内部使用 Arc 管理连接池，clone() 是轻量操作（仅复制引用计数），性能开销可忽略。
     pub fn new(client: HttpClient) -> Self {
         Self {
-            /// reqwest::Client 内部使用 Arc 管理连接池，clone() 是轻量操作（仅复制引用计数），性能开销可忽略。
             champ_select: ChampSelectHttpApi::new(client.clone()),
             champion_mastery: ChampionMasteryHttpApi::new(client.clone()),
             chat: ChatHttpApi::new(client.clone()),

@@ -1,6 +1,6 @@
 use crate::{
     shared::http_api::league_client::httpclient::HttpClient,
-    shared::types::lobby::{
+    shared::types::league_client::lobby::{
         AvailableBot, EogStatus, Lobby, LobbyMember, QueueEligibility, ReceivedInvitation,
     },
     utils::error::http_error::HttpError,

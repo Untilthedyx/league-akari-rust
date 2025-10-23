@@ -1,6 +1,6 @@
 use crate::{
     shared::http_api::league_client::httpclient::HttpClient,
-    shared::types::game_data::AccountScopeLoadouts,
+    shared::types::league_client::game_data::AccountScopeLoadouts,
     utils::error::http_error::HttpError,
 };
 use serde::Serialize;

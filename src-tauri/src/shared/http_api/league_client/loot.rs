@@ -1,6 +1,6 @@
 use crate::{
     shared::http_api::league_client::httpclient::HttpClient,
-    shared::types::loot::{LootCraftResponse, LootMap},
+    shared::types::league_client::loot::{LootCraftResponse, LootMap},
     utils::error::http_error::HttpError,
 };
 

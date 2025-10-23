@@ -1,5 +1,5 @@
 use crate::{
-    shared::http_api::league_client::httpclient::HttpClient, shared::types::perks::*,
+    shared::http_api::league_client::httpclient::HttpClient, shared::types::league_client::perks::*,
     utils::error::http_error::HttpError,
 };
 

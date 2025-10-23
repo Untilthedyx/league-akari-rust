@@ -1,6 +1,6 @@
 use crate::{
     shared::http_api::league_client::httpclient::HttpClient,
-    shared::types::gameflow::{GameflowPhase, GameflowSession},
+    shared::types::league_client::gameflow::{GameflowPhase, GameflowSession},
     utils::error::http_error::HttpError,
 };
 use serde::Serialize;

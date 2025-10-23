@@ -1,5 +1,5 @@
 use crate::{
-    shared::http_api::league_client::httpclient::HttpClient, shared::types::login::LoginQueueState,
+    shared::http_api::league_client::httpclient::HttpClient, shared::types::league_client::login::LoginQueueState,
     utils::error::http_error::HttpError,
 };
 use serde::Serialize;

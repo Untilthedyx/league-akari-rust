@@ -1,11 +1,17 @@
-
-
-
 ```cmd
 npm run tauri dev
 npm run tauri build --release
 ```
 
+## 智能指针
+
+### 1. LazyLock 惰性锁 和 OnceCell
+
+LazyLock 的初始化是 "被动触发" 的（第一次访问时自动执行），而 OnceCell 可以通过 get_or_init 主动控制初始化时机。
+
+### 2. RwLock 读写锁相较于 Mutex
+
+RwLock 可以同时允许多个读操作，但是只允许一个写操作，写操作会阻塞所有的读操作。Mutex 则是无论读写操作都会阻塞。
 
 ## 配置文件
 

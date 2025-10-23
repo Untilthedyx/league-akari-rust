@@ -1,6 +1,6 @@
 use crate::{
     shared::http_api::league_client::httpclient::HttpClient,
-    shared::types::player_notifications::*, utils::error::http_error::HttpError,
+    shared::types::league_client::player_notifications::*, utils::error::http_error::HttpError,
 };
 
 pub struct PlayerNotificationsHttpApi {

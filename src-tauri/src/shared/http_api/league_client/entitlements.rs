@@ -1,5 +1,5 @@
 use crate::shared::http_api::league_client::httpclient::HttpClient;
-use crate::shared::types::entitlements::EntitlementsToken;
+use crate::shared::types::league_client::entitlements::EntitlementsToken;
 use crate::utils::error::http_error::HttpError;
 
 pub struct EntitlementsHttpApi {

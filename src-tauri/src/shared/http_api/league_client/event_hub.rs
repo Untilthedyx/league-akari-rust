@@ -1,6 +1,6 @@
 use crate::shared::{
     http_api::league_client::httpclient::HttpClient,
-    types::event_hub::*, // 导入事件相关数据结构
+    types::league_client::event_hub::*, // 导入事件相关数据结构
 };
 use crate::utils::error::http_error::HttpError;
 use serde::Serialize;

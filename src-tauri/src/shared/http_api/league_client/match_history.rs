@@ -1,6 +1,6 @@
 use crate::{
     shared::http_api::league_client::httpclient::HttpClient,
-    shared::types::match_history::{Game, GameTimeline, MatchHistory},
+    shared::types::league_client::match_history::{Game, GameTimeline, MatchHistory},
     utils::error::http_error::HttpError,
 };
 

@@ -1,5 +1,5 @@
 use crate::shared::http_api::league_client::httpclient::HttpClient;
-use crate::shared::types::store::GiftableFriend;
+use crate::shared::types::league_client::store::GiftableFriend;
 use crate::utils::error::http_error::HttpError;
 
 /// Riot 客户端相关的 HTTP API 客户端

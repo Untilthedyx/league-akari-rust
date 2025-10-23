@@ -1,6 +1,6 @@
 use crate::shared::{
     http_api::league_client::httpclient::HttpClient,
-    types::game_data::*, // 导入游戏数据相关类型
+    types::league_client::game_data::*, // 导入游戏数据相关类型
 };
 use crate::utils::error::http_error::HttpError;
 use tracing::instrument;

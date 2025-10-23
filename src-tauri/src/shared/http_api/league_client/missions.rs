@@ -1,6 +1,6 @@
 use crate::{
     shared::http_api::league_client::httpclient::HttpClient,
-    shared::types::missions::{Mission, MissionData, MissionSeries},
+    shared::types::league_client::missions::{Mission, MissionData, MissionSeries},
     utils::error::http_error::HttpError,
 };
 use serde::Serialize;

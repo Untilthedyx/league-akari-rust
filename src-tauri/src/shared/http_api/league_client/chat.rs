@@ -3,7 +3,7 @@
 
 use crate::shared::{
     http_api::league_client::httpclient::HttpClient, // 通用 HTTP 客户端
-    types::chat::*, // 聊天相关数据结构（Friend、Conversation 等）
+    types::league_client::chat::*, // 聊天相关数据结构（Friend、Conversation 等）
 };
 use crate::utils::error::http_error::HttpError; // HTTP 错误类型
 use serde::Serialize; // 用于 JSON 序列化

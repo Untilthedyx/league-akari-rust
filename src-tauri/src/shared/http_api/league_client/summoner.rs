@@ -1,5 +1,5 @@
 use crate::shared::http_api::league_client::httpclient::HttpClient;
-use crate::shared::types::summoner::{SummonerInfo, SummonerProfile};
+use crate::shared::types::league_client::summoner::{SummonerInfo, SummonerProfile};
 use crate::utils::error::http_error::HttpError;
 use serde::Serialize;
 use urlencoding::encode;
