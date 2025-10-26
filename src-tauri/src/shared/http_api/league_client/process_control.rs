@@ -1,5 +1,5 @@
 use crate::{
-    shared::http_api::league_client::httpclient::HttpClient, utils::error::http_error::HttpError,
+    shared::http_api::http::HttpClient, utils::error::http_error::HttpError,
 };
 
 pub struct ProcessControlHttpApi {

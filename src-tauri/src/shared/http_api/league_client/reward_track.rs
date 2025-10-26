@@ -1,4 +1,4 @@
-use crate::shared::http_api::league_client::httpclient::HttpClient;
+use crate::shared::http_api::http::HttpClient;
 use crate::utils::error::http_error::HttpError;
 // 假设奖励轨道相关类型定义在以下路径（根据实际情况调整）
 

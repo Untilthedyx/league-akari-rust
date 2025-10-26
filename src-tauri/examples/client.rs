@@ -1,4 +1,4 @@
-use tauri_app_demo_lib::shared::http_api::league_client::httpclient::HttpClient;
+use tauri_app_demo_lib::shared::http_api::http::HttpClient;
 use tauri_app_demo_lib::shared::http_api::league_client::LeagueClientHttpApiAxiosHelper;
 use tauri_app_demo_lib::utils::log::{config::LogConfig, init_logger};
 use tauri_app_demo_lib::utils::process::get_client_info;

@@ -1,273 +1,189 @@
-use serde::Serialize;
-use std::collections::HashMap;
-use tauri::{State, Manager};
-use std::sync::Mutex;
+pub mod champ_select;
+pub mod chat;
+pub mod entitlements;
+pub mod game_data;
+pub mod gameflow;
+pub mod honor;
+pub mod league_session;
+pub mod lobby;
+pub mod lobby_team_builder;
+pub mod login;
+pub mod matchmaking;
+pub mod summoner;
 
-// 这些类型需要根据你的实际结构定义
-#[derive(Clone, Serialize)]
-pub struct SummonerSpell {
-    // 字段定义
-    pub id: i32,
-    pub name: String,
+use std::collections::HashSet;
+use std::sync::{Arc, Mutex};
+
+use crate::core::shards::league_client::lcu_state::champ_select::ChampSelectStateLock;
+use crate::core::shards::league_client::lcu_state::chat::ChatStateLock;
+use crate::core::shards::league_client::lcu_state::entitlements::EntitlementsStateLock;
+use crate::core::shards::league_client::lcu_state::game_data::GameDataStateLock;
+use crate::core::shards::league_client::lcu_state::gameflow::GameflowStateLock;
+use crate::core::shards::league_client::lcu_state::honor::HonorStateLock;
+use crate::core::shards::league_client::lcu_state::league_session::LeagueSessionStateLock;
+use crate::core::shards::league_client::lcu_state::lobby::LobbyStateLock;
+use crate::core::shards::league_client::lcu_state::lobby_team_builder::LobbyTeamBuilderStateLock;
+use crate::core::shards::league_client::lcu_state::login::LoginStateLock;
+use crate::core::shards::league_client::lcu_state::matchmaking::MatchmakingStateLock;
+use crate::core::shards::league_client::lcu_state::summoner::SummonerStateLock;
+use crate::core::shards::league_client::utils::task_runner::{
+    TaskCompletePayload, TaskGroupOptions, TaskRunner,
+};
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Default, Deserialize, Serialize)]
+pub struct InitializationProgress {
+    pub current_id: Option<String>,
+    pub finished: Vec<String>,
+    pub all: Vec<String>,
 }
 
-#[derive(Clone, Serialize)]
-pub struct Item {
-    pub id: i32,
-    pub name: String,
-    // 其他字段
+#[derive(Debug, Default, Deserialize, Serialize)]
+pub struct InitializationState {
+    pub progress: Option<InitializationProgress>,
 }
 
-#[derive(Clone, Serialize)]
-pub struct Queue {
-    pub id: i32,
-    pub description: String,
-    // 其他字段
-}
-
-#[derive(Clone, Serialize)]
-pub struct Perk {
-    pub id: i32,
-    pub name: String,
-    // 其他字段
-}
-
-#[derive(Clone, Serialize)]
-pub struct PerkStyle {
-    pub id: i32,
-    pub name: String,
-    // 其他字段
-}
-
-#[derive(Clone, Serialize)]
-pub struct Augment {
-    pub id: i32,
-    pub name: String,
-    // 其他字段
-}
-
-#[derive(Clone, Serialize)]
-pub struct ChampionSimple {
-    pub id: i32,
-    pub name: String,
-    // 其他字段
-}
-
-// 主状态结构
-#[derive(Default, Clone, Serialize)]
-pub struct GameDataState {
-    pub summoner_spells: HashMap<i32, SummonerSpell>,
-    pub items: HashMap<i32, Item>,
-    pub queues: HashMap<i32, Queue>,
-    pub perks: HashMap<i32, Perk>,
-    pub perk_styles: PerkStylesData,
-    pub augments: HashMap<i32, Augment>,
-    pub champions: HashMap<i32, ChampionSimple>,
-}
-
-#[derive(Default, Clone, Serialize)]
-pub struct PerkStylesData {
-    pub schema_version: i32,
-    pub styles: HashMap<i32, PerkStyle>,
-}
-
-// 事件类型
-#[derive(Clone, Serialize)]
-pub enum GameDataEvent {
-    SummonerSpellsUpdated { data: HashMap<i32, SummonerSpell> },
-    ItemsUpdated { data: HashMap<i32, Item> },
-    QueuesUpdated { data: HashMap<i32, Queue> },
-    PerksUpdated { data: HashMap<i32, Perk> },
-    PerkStylesUpdated { data: PerkStylesData },
-    AugmentsUpdated { data: HashMap<i32, Augment> },
-    ChampionsUpdated { data: HashMap<i32, ChampionSimple> },
-}
-
-// 应用状态包装
-pub struct AppGameDataState {
-    state: Mutex<GameDataState>,
-}
-
-impl AppGameDataState {
+impl InitializationState {
     pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn set_progress(&mut self, progress: Option<InitializationProgress>) {
+        self.progress = progress;
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct LeagueClientData {
+    pub _state_initializer: Arc<Mutex<TaskRunner>>,
+    pub initialization: Arc<Mutex<InitializationState>>,
+    pub gameflow: GameflowStateLock,
+    pub chat: ChatStateLock,
+    pub honor: HonorStateLock,
+    pub champ_select: ChampSelectStateLock,
+    pub login: LoginStateLock,
+    pub lobby: LobbyStateLock,
+    pub summoner: SummonerStateLock,
+    pub matchmaking: MatchmakingStateLock,
+    pub game_data: GameDataStateLock,
+    pub entitlements: EntitlementsStateLock,
+    pub league_session: LeagueSessionStateLock,
+    pub lobby_team_builder: LobbyTeamBuilderStateLock,
+}
+
+impl LeagueClientData {
+    pub fn new() -> Self {
+        // 不需要用 Arc 包装 TaskRunner，直接创建
+        let mut _state_initializer = Arc::new(Mutex::new(TaskRunner::new(10)));
+        let initialization = Arc::new(Mutex::new(InitializationState::new()));
+        // 使用 Arc<Mutex<HashSet>> 实现线程安全的集合共享和修改
+        let finished_tasks = Arc::new(Mutex::new(HashSet::new()));
+
+        // 其他状态初始化保持不变
+        let gameflow = GameflowStateLock::new();
+        let chat = ChatStateLock::new();
+        let honor = HonorStateLock::new();
+        let champ_select = ChampSelectStateLock::new();
+        let login = LoginStateLock::new();
+        let lobby = LobbyStateLock::new();
+        let summoner = SummonerStateLock::new();
+        let matchmaking = MatchmakingStateLock::new();
+        let game_data = GameDataStateLock::new();
+        let entitlements = EntitlementsStateLock::new();
+        let league_session = LeagueSessionStateLock::new();
+        let lobby_team_builder = LobbyTeamBuilderStateLock::new();
+
+        // 克隆初始化状态供闭包使用
+        let initialization_start = initialization.clone();
+        _state_initializer
+            .lock()
+            .unwrap()
+            .create_group(
+                "game-data",
+                TaskGroupOptions {
+                    concurrency: Some(3),
+                    after_group: None,
+                },
+            )
+            .unwrap();
+
+        // 处理启动回调
+        _state_initializer.lock().unwrap().on_start(move || {
+            initialization_start
+                .lock()
+                .unwrap()
+                .set_progress(Some(InitializationProgress {
+                    current_id: None,
+                    finished: vec![],
+                    all: vec![],
+                }));
+        });
+
+        let finished_tasks_clone = finished_tasks.clone();
+        let initialization_clone = initialization.clone();
+        let state_initializer_clone = _state_initializer.clone();
+
+        // 处理任务完成回调
+        _state_initializer
+            .lock()
+            .unwrap()
+            .on_task_complete(move |payload| match &*payload {
+                TaskCompletePayload::Success { id, value: _ } => {
+                    // 锁定集合并插入完成的任务 ID
+                    let mut finished = finished_tasks_clone.lock().unwrap();
+                    finished.insert(id.clone());
+
+                    // 更新初始化进度
+                    let mut init_state = initialization_clone.lock().unwrap();
+                    init_state.set_progress(Some(InitializationProgress {
+                        current_id: Some(id.clone()),
+                        // 将 HashSet 转换为 Vec（注意解引用顺序）
+                        finished: finished.iter().cloned().collect(),
+                        // 获取所有任务 ID 并转换为 Vec
+                        all: state_initializer_clone
+                            .lock()
+                            .unwrap()
+                            .tasks
+                            .lock()
+                            .unwrap()
+                            .keys()
+                            .cloned()
+                            .collect(),
+                    }));
+                }
+                TaskCompletePayload::Error { id: _, error: _ } => {
+                    // 可以在这里处理错误情况
+                }
+            });
+
+        let finished_tasks_clone = finished_tasks.clone();
+        let initialization_clone = initialization.clone();
+
+        _state_initializer.lock().unwrap().on_stop(move || {
+            finished_tasks_clone.lock().unwrap().clear();
+            initialization_clone.lock().unwrap().set_progress(None);
+        });
+
         Self {
-            state: Mutex::new(GameDataState::default()),
+            _state_initializer,
+            initialization,
+            gameflow,
+            chat,
+            honor,
+            champ_select,
+            login,
+            lobby,
+            summoner,
+            matchmaking,
+            game_data,
+            entitlements,
+            league_session,
+            lobby_team_builder,
         }
     }
 
-    // 辅助方法：发射事件
-    fn emit_event(&self, app_handle: &tauri::AppHandle, event: GameDataEvent) {
-        let _ = app_handle.emit_all("game-data-updated", event);
-    }
-
-    // 获取冠军名称
-    pub fn champion_name(&self, id: i32) -> String {
-        let state = self.state.lock().unwrap();
-        state.champions
-            .get(&id)
-            .map(|champ| champ.name.clone())
-            .unwrap_or_else(|| id.to_string())
-    }
-
-    // 设置召唤师技能
-    pub fn set_summoner_spells(
-        &self, 
-        app_handle: &tauri::AppHandle, 
-        value: HashMap<i32, SummonerSpell>
-    ) {
-        {
-            let mut state = self.state.lock().unwrap();
-            state.summoner_spells = value.clone();
-        }
-        
-        self.emit_event(
-            app_handle, 
-            GameDataEvent::SummonerSpellsUpdated { data: value }
-        );
-    }
-
-    // 设置物品
-    pub fn set_items(
-        &self, 
-        app_handle: &tauri::AppHandle, 
-        value: HashMap<i32, Item>
-    ) {
-        {
-            let mut state = self.state.lock().unwrap();
-            state.items = value.clone();
-        }
-        
-        self.emit_event(
-            app_handle, 
-            GameDataEvent::ItemsUpdated { data: value }
-        );
-    }
-
-    // 设置队列
-    pub fn set_queues(
-        &self, 
-        app_handle: &tauri::AppHandle, 
-        value: HashMap<i32, Queue>
-    ) {
-        {
-            let mut state = self.state.lock().unwrap();
-            state.queues = value.clone();
-        }
-        
-        self.emit_event(
-            app_handle, 
-            GameDataEvent::QueuesUpdated { data: value }
-        );
-    }
-
-    // 设置符文
-    pub fn set_perks(
-        &self, 
-        app_handle: &tauri::AppHandle, 
-        value: HashMap<i32, Perk>
-    ) {
-        {
-            let mut state = self.state.lock().unwrap();
-            state.perks = value.clone();
-        }
-        
-        self.emit_event(
-            app_handle, 
-            GameDataEvent::PerksUpdated { data: value }
-        );
-    }
-
-    // 设置符文样式
-    pub fn set_perk_styles(
-        &self, 
-        app_handle: &tauri::AppHandle, 
-        value: PerkStylesData
-    ) {
-        {
-            let mut state = self.state.lock().unwrap();
-            state.perk_styles = value.clone();
-        }
-        
-        self.emit_event(
-            app_handle, 
-            GameDataEvent::PerkStylesUpdated { data: value }
-        );
-    }
-
-    // 设置强化
-    pub fn set_augments(
-        &self, 
-        app_handle: &tauri::AppHandle, 
-        value: HashMap<i32, Augment>
-    ) {
-        {
-            let mut state = self.state.lock().unwrap();
-            state.augments = value.clone();
-        }
-        
-        self.emit_event(
-            app_handle, 
-            GameDataEvent::AugmentsUpdated { data: value }
-        );
-    }
-
-    // 设置英雄
-    pub fn set_champions(
-        &self, 
-        app_handle: &tauri::AppHandle, 
-        value: HashMap<i32, ChampionSimple>
-    ) {
-        {
-            let mut state = self.state.lock().unwrap();
-            state.champions = value.clone();
-        }
-        
-        self.emit_event(
-            app_handle, 
-            GameDataEvent::ChampionsUpdated { data: value }
-        );
-    }
-
-    // 获取完整状态（用于前端初始化）
-    pub fn get_full_state(&self) -> GameDataState {
-        self.state.lock().unwrap().clone()
-    }
+    // pub async fn _lcu_game_flow(&self){
+    //     self.
+    // }
 }
-
-// Tauri 命令
-#[tauri::command]
-async fn set_summoner_spells(
-    spells: HashMap<i32, SummonerSpell>,
-    state: State<'_, AppGameDataState>,
-    app_handle: tauri::AppHandle,
-) -> Result<(), String> {
-    state.set_summoner_spells(&app_handle, spells);
-    Ok(())
-}
-
-#[tauri::command]
-async fn set_champions(
-    champions: HashMap<i32, ChampionSimple>,
-    state: State<'_, AppGameDataState>,
-    app_handle: tauri::AppHandle,
-) -> Result<(), String> {
-    state.set_champions(&app_handle, champions);
-    Ok(())
-}
-
-#[tauri::command]
-async fn get_champion_name(
-    id: i32,
-    state: State<'_, AppGameDataState>,
-) -> Result<String, String> {
-    Ok(state.champion_name(id))
-}
-
-#[tauri::command]
-async fn get_game_data_state(
-    state: State<'_, AppGameDataState>,
-) -> Result<GameDataState, String> {
-    Ok(state.get_full_state())
-}
-
-// 其他命令...

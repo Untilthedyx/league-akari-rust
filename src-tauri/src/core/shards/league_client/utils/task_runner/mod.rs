@@ -33,7 +33,7 @@ pub enum TaskCompletePayload {
 /// 注意：不能用 `Box<dyn FnOnce>` 作为 trait object（object-safe 问题）
 /// 我把 Task.func 统一改为 `Box<dyn Fn() -> Pin<Box<dyn Future<...>>> + Send + Sync>`  ？？？ 这里为什么要加入 Sync
 /// 要求注册时传入的闭包实现 `Fn()`（可重复调用）——这是常见的处理方式。
-struct Task {
+pub struct Task {
     id: String,
     func: Box<
         dyn Fn() -> Pin<
@@ -93,8 +93,8 @@ struct TaskGroup {
 /// 任务组配置
 #[derive(Default)]
 pub struct TaskGroupOptions {
-    concurrency: Option<usize>,
-    after_group: Option<Vec<String>>, // 依赖的组
+    pub concurrency: Option<usize>,
+    pub after_group: Option<Vec<String>>, // 依赖的组
 }
 
 /// 任务注册配置
@@ -108,7 +108,7 @@ pub struct RegisterOptions {
 #[derive(Default)]
 pub struct TaskRunner {
     groups: Arc<Mutex<HashMap<String, TaskGroup>>>, // 所有任务组（每个组内部有自己的队列、信号量、notify）。<组名：内容>
-    tasks: Arc<Mutex<HashMap<String, Task>>>,       // 所有注册但未开始的任务。 <>
+    pub tasks: Arc<Mutex<HashMap<String, Task>>>,       // 所有注册但未开始的任务。 <>
     is_running: Arc<AtomicBool>,                    // 是否正在运行。
     global_join_set: Arc<Mutex<JoinSet<()>>>, // 全局任务集：管理所有顶级任务（用于统一取消）管理所有异步任务生命周期（可统一取消）。
     default_concurrency: usize,               // 默认并发数。

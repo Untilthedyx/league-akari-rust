@@ -1,13 +1,8 @@
 use crate::utils::error::http_error::HttpError;
 use reqwest::{Client, Method, Response};
-use serde::{
-    de::{DeserializeOwned, Error as SerdeError},
-    Serialize,
-};
+use serde::{de::Error as SerdeError, Serialize, de::DeserializeOwned};
 use std::any::TypeId;
 use tracing::{error, instrument, warn, Span};
-
-
 
 /// 通用 HTTP 客户端封装（适用于 Riot 本地 API 或自签证书服务）
 ///
@@ -215,8 +210,4 @@ impl HttpClient {
 
 pub trait HttpData: Serialize + DeserializeOwned + Default + 'static {}
 
-impl<T> HttpData for T
-where
-    T: Serialize + DeserializeOwned + Default + 'static,
-{}
-
+impl<T> HttpData for T where T: Serialize + DeserializeOwned + Default + 'static {}

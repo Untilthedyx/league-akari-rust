@@ -2,7 +2,7 @@
 //! 提供与游戏内聊天系统交互的各种接口，包括好友管理、会话操作、消息发送等功能
 
 use crate::shared::{
-    http_api::league_client::httpclient::HttpClient, // 通用 HTTP 客户端
+    http_api::http::HttpClient, // 通用 HTTP 客户端
     types::league_client::chat::*, // 聊天相关数据结构（Friend、Conversation 等）
 };
 use crate::utils::error::http_error::HttpError; // HTTP 错误类型

@@ -1,5 +1,5 @@
 use crate::{
-    shared::http_api::league_client::httpclient::HttpClient,
+    shared::http_api::http::HttpClient,
     shared::types::league_client::lobby::{
         AvailableBot, EogStatus, Lobby, LobbyMember, QueueEligibility, ReceivedInvitation,
     },

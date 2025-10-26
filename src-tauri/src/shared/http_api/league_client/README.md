@@ -3,7 +3,7 @@
 这里需要做很多东西，主要测试代码为：
 
 ```rust
-use tauri_app_demo_lib::shared::http_api::league_client::httpclient::HttpClient;
+use tauri_app_demo_lib::shared::http_api::httpclient::HttpClient;
 use tauri_app_demo_lib::shared::http_api::league_client::LeagueClientHttpApiAxiosHelper;
 use tauri_app_demo_lib::utils::log::{config::LogConfig, init_logger};
 use tauri_app_demo_lib::utils::process::get_client_info;
