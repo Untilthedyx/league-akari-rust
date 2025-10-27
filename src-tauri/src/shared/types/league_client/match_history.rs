@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use serde_json::Value;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -29,6 +30,7 @@ pub struct Game {
     pub game_duration: i32,
     pub game_id: i64,
     pub game_mode: String,
+    pub game_mode_mutators: Vec<Value>, // 暂时没有用到
     pub game_type: String,
     pub game_version: String,
     pub map_id: i32,
@@ -42,23 +44,9 @@ pub struct Game {
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct Team {
-    pub bans: Vec<serde_json::Value>, // any[]
-    pub baron_kills: i32,
-    pub dominion_victory_score: i32,
-    pub dragon_kills: i32,
-    pub first_baron: bool,
-    pub first_blood: bool,
-    #[serde(rename = "firstDargon")] // 保持与原接口拼写一致（可能是笔误）
-    pub first_dargon: bool,
-    pub first_inhibitor: bool,
-    pub first_tower: bool,
-    pub inhibitor_kills: i32,
-    pub rift_herald_kills: i32,
-    pub team_id: i32,
-    pub tower_kills: i32,
-    pub vilemaw_kills: i32,
-    pub win: String, // 可根据需要改为枚举："Win" | "Fail"
+pub struct ParticipantIdentity {
+    pub participant_id: i32,
+    pub player: Player,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
@@ -73,6 +61,28 @@ pub struct Participant {
     pub team_id: i32,
     pub timeline: Timeline,
 }
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct Team {
+    pub bans: Vec<Value>, // 暂时没用到
+    pub baron_kills: i32,
+    pub dominion_victory_score: i32,
+    pub dragon_kills: i32,
+    pub first_baron: bool,
+    pub first_blood: bool,
+    pub first_dargon: bool,
+    pub first_inhibitor: bool,
+    pub first_tower: bool,
+    pub horde_kills: i32, // 新添加
+    pub inhibitor_kills: i32,
+    pub rift_herald_kills: i32,
+    pub team_id: i32,
+    pub tower_kills: i32,
+    pub vilemaw_kills: i32,
+    pub win: String, // 可根据需要改为枚举："Win" | "Fail"
+}
+
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -95,6 +105,7 @@ pub type CsDiffPerMinDeltas = HashMap<String, f64>;
 /// 键为时间区间（如 "0-10"、"10-20" 等），值为对应数值
 pub type CreepsPerMinDeltas = HashMap<String, f64>;
 
+/// 游戏状态，非常值得分析
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Stats {
@@ -126,14 +137,9 @@ pub struct Stats {
     pub item4: i32,
     pub item5: i32,
     pub item6: i32,
-    pub player_augment1: i32,
-    pub player_augment2: i32,
-    pub player_augment3: i32,
-    pub player_augment4: i32,
-    pub player_augment5: i32,
-    pub player_augment6: i32,
     pub killing_sprees: i32,
     pub kills: i32,
+
     pub largest_critical_strike: i32,
     pub largest_killing_spree: i32,
     pub largest_multi_kill: i32,
@@ -141,6 +147,7 @@ pub struct Stats {
     pub magic_damage_dealt: i32,
     pub magic_damage_dealt_to_champions: i32,
     pub magical_damage_taken: i32,
+
     pub neutral_minions_killed: i32,
     pub neutral_minions_killed_enemy_jungle: i32,
     pub neutral_minions_killed_team_jungle: i32,
@@ -171,11 +178,20 @@ pub struct Stats {
     pub perk5_var1: i32,
     pub perk5_var2: i32,
     pub perk5_var3: i32,
+
     pub perk_primary_style: i32,
     pub perk_sub_style: i32,
     pub physical_damage_dealt: i32,
     pub physical_damage_dealt_to_champions: i32,
     pub physical_damage_taken: i32,
+
+    pub player_augment1: i32,
+    pub player_augment2: i32,
+    pub player_augment3: i32,
+    pub player_augment4: i32,
+    pub player_augment5: i32,
+    pub player_augment6: i32,
+
     pub player_score0: i32,
     pub player_score1: i32,
     pub player_score2: i32,
@@ -186,11 +202,13 @@ pub struct Stats {
     pub player_score7: i32,
     pub player_score8: i32,
     pub player_score9: i32,
+    pub player_subteam_id: i32,
+
     pub quadra_kills: i32,
     pub sight_wards_bought_in_game: i32,
     pub subteam_placement: i32,
     pub team_early_surrendered: bool,
-    pub time_ccing_others: i32,
+    pub time_c_cing_others: i32,
     pub total_damage_dealt: i32,
     pub total_damage_dealt_to_champions: i32,
     pub total_damage_taken: i32,
@@ -211,7 +229,6 @@ pub struct Stats {
     pub wards_killed: i32,
     pub wards_placed: i32,
     pub win: bool,
-    pub player_subteam_id: i32,
 
     // SGP 转换的额外字段
     pub individual_position: Option<String>, // "Invalid" | "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY"
@@ -230,13 +247,6 @@ pub struct Stats {
     pub hold_pings: Option<i32>,
     pub need_vision_pings: Option<i32>,
     pub on_my_way_pings: Option<i32>,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ParticipantIdentity {
-    pub participant_id: i32,
-    pub player: Player,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
