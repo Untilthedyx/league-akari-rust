@@ -186,7 +186,8 @@ export default function AssetImage({
   if (isLoading || hasError || !imageUrl) {
     return (
       <div
-        className={cn("bg-muted/30 border border-border", className)}
+        className={cn("bg-muted/30 border-none", className)}
+        style={{ border: "none", outline: "none" }}
         aria-label={alt || `${type} ${id}`}
         {...props}
       />
@@ -197,7 +198,8 @@ export default function AssetImage({
     <img
       src={imageUrl}
       alt={alt || `${type} ${id}`}
-      className={className}
+      className={cn("border-none", className)}
+      style={{ border: "none", outline: "none" }}
       onError={() => {
         // 加载失败时标记错误，显示占位元素
         setHasError(true);
