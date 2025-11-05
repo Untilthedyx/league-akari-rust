@@ -11,4 +11,6 @@ pub enum HttpError {
     HttpResponse(String), // 非 2xx 状态码（如 404、500）
     #[error("解析错误: {0}")]
     JsonParse(serde_json::Error), // 响应体 JSON 解析失败
+    #[error("未找到资源: {0}")]
+    NotFound(String), // 未找到资源
 }
