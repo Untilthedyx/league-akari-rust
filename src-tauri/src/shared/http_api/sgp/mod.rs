@@ -1,8 +1,15 @@
 pub mod http;
 
+use tungstenite::Bytes;
+
 use crate::shared::http_api::sgp::http::HttpClient;
 use crate::shared::init::http::get_http_client;
-use crate::shared::types::sgp::*;
+use crate::shared::types::sgp::game_detail::SgpGameDetailsLol;
+use crate::shared::types::sgp::game_summary::SgpGameSummaryLol;
+use crate::shared::types::sgp::history::SgpMatchHistoryLol;
+use crate::shared::types::sgp::rank_stats::SgpRankedStats;
+use crate::shared::types::sgp::spectator_data::SgpSpectatorData;
+use crate::shared::types::sgp::summoner::SgpSummoner;
 use crate::utils::error::http_error::HttpError;
 
 pub struct SgpApi {
@@ -19,6 +26,8 @@ impl SgpApi {
     pub async fn get_match_history(
         &self,
         player_puuid: &str,
+        start_index: i32,
+        count: i32,
     ) -> Result<SgpMatchHistoryLol, HttpError> {
         let lcu_client = get_http_client().await.unwrap();
         let token = lcu_client
@@ -29,12 +38,11 @@ impl SgpApi {
             .access_token;
 
         let uri = format!(
-            "/match-history-query/v1/products/lol/player/{}/SUMMARY",
-            player_puuid
+            "/match-history-query/v1/products/lol/player/{}/SUMMARY?startIndex={}&count={}",
+            player_puuid, start_index, count
         );
-        self.client
-            .get::<SgpMatchHistoryLol>(uri.as_str(), Some(&token))
-            .await
+        let url = self.client.build_url(uri.as_str(), "match_history");
+        self.client.get(url.as_str(), Some(&token)).await
     }
 
     pub async fn get_game_summary(
@@ -50,13 +58,12 @@ impl SgpApi {
             .unwrap()
             .access_token;
 
-        let url = format!(
+        let uri = format!(
             "/match-history-query/v1/products/lol/{}_{}/SUMMARY",
             rso_platform_id, game_id
         );
-        self.client
-            .get::<SgpGameSummaryLol>(url.as_str(), Some(&token))
-            .await
+        let url = self.client.build_url(uri.as_str(), "match_history");
+        self.client.get(url.as_str(), Some(&token)).await
     }
 
     pub async fn get_game_detail(
@@ -72,13 +79,12 @@ impl SgpApi {
             .unwrap()
             .access_token;
 
-        let url = format!(
+        let uri = format!(
             "/match-history-query/v1/products/lol/{}_{}/DETAILS",
             rso_platform_id, game_id
         );
-        self.client
-            .get::<SgpGameDetailsLol>(url.as_str(), Some(&token))
-            .await
+        let url = self.client.build_url(uri.as_str(), "match_history");
+        self.client.get(url.as_str(), Some(&token)).await
     }
 
     pub async fn get_ranked_stats(&self, puuid: &str) -> Result<SgpRankedStats, HttpError> {
@@ -89,10 +95,9 @@ impl SgpApi {
             .await
             .unwrap();
 
-        let url = format!("/leagues-ledge/v2/rankedStats/puuid/{}", puuid);
-        self.client
-            .get::<SgpRankedStats>(url.as_str(), Some(&token))
-            .await
+        let uri = format!("/leagues-ledge/v2/rankedStats/puuid/{}", puuid);
+        let url = self.client.build_url(uri.as_str(), "common");
+        self.client.get(url.as_str(), Some(&token)).await
     }
 
     pub async fn get_summoner_by_puuid(
@@ -107,20 +112,27 @@ impl SgpApi {
             .await
             .unwrap();
 
-        let url = format!(
+        let uri = format!(
             "/summoner-ledge/v1/regions/{}/summoners/puuids",
             rso_platform_id
         );
+        let url = self.client.build_url(uri.as_str(), "common");
         self.client
-            .post::<String, Vec<SgpSummoner>>(url.as_str(), Some(&puuid.to_string()), Some(&token))
+            .post::<Vec<String>, Vec<SgpSummoner>>(
+                url.as_str(),
+                Some(&vec![puuid.to_string()]),
+                Some(&token),
+            )
             .await
     }
 
+    /// 在这里如果没有在游戏中就代表 Player not found
+    /// 获取游戏状态
     pub async fn get_spectator_gameflow_by_puuid(
         &self,
         puuid: &str,
         rso_platform_id: &str,
-    ) -> Result<SpectatorData, HttpError> {
+    ) -> Result<SgpSpectatorData, HttpError> {
         let lcu_client = get_http_client().await.unwrap();
         let token = lcu_client
             .league_session
@@ -128,21 +140,20 @@ impl SgpApi {
             .await
             .unwrap();
 
-        let url = format!(
+        let uri = format!(
             "/gsm/v1/ledge/spectator/region/{}/puuid/{}",
             rso_platform_id, puuid
         );
-        self.client
-            .get::<SpectatorData>(url.as_str(), Some(&token))
-            .await
+        let url = self.client.build_url(uri.as_str(), "common");
+        self.client.get(url.as_str(), Some(&token)).await
     }
 
-    /// Readable 需要处理
+    // /// Readable 需要处理
     pub async fn get_match_history_replay_stream(
         &self,
         game_id: i64,
         rso_platform_id: &str,
-    ) -> Result<Readable, HttpError> {
+    ) -> Result<Bytes, HttpError> {
         // TODO: responseType: 'stream'
         let lcu_client = get_http_client().await.unwrap();
         let token = lcu_client
@@ -151,33 +162,11 @@ impl SgpApi {
             .await
             .unwrap();
 
-        let url = format!(
+        let uri = format!(
             "/match-history-query/v3/product/lol/matchId/{}_{}/infoType/replay",
             rso_platform_id, game_id
         );
-        self.client.get::<Readable>(url.as_str(), Some(&token)).await
-    }
-
-    /// 这里 _________ 需要处理
-    pub async fn get_end_of_game_stats(
-        &self,
-        game_id: i64,
-        rso_platform_id: &str,
-        puuid: &str,
-    ) -> Result<_________, HttpError> {
-        let lcu_client = get_http_client().await.unwrap();
-        let token = lcu_client
-            .league_session
-            .get_league_session_token()
-            .await
-            .unwrap();
-
-        let url = format!(
-            "/stats/endOfGame/region/{}/gameId/{}/puuid/{}",
-            rso_platform_id, game_id, puuid
-        );
-        self.client
-            .get::<_________>(url.as_str(), Some(&token))
-            .await
+        let url = self.client.build_url(uri.as_str(), "match_history");
+        self.client.get_stream(url.as_str(), Some(&token)).await
     }
 }
