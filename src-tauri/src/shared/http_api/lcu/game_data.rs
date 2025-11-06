@@ -1,5 +1,5 @@
 use crate::shared::{
-    http_api::http::HttpClient,
+    http_api::lcu::http::HttpClient,
     types::league_client::game_data::*, // 导入游戏数据相关类型
 };
 use crate::utils::error::http_error::HttpError;

@@ -1,4 +1,4 @@
-use crate::shared::http_api::http::HttpClient;
+use crate::shared::http_api::lcu::http::HttpClient;
 use crate::shared::types::league_client::entitlements::EntitlementsToken;
 use crate::utils::error::http_error::HttpError;
 

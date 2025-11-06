@@ -1,5 +1,5 @@
 use crate::{
-    shared::http_api::http::HttpClient, shared::types::league_client::matchmaking::GetSearch,
+    shared::http_api::lcu::http::HttpClient, shared::types::league_client::matchmaking::GetSearch,
     utils::error::http_error::HttpError,
 };
 

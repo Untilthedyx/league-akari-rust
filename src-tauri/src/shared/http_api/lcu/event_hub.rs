@@ -1,5 +1,5 @@
 use crate::shared::{
-    http_api::http::HttpClient,
+    http_api::lcu::http::HttpClient,
     types::league_client::event_hub::*, // 导入事件相关数据结构
 };
 use crate::utils::error::http_error::HttpError;

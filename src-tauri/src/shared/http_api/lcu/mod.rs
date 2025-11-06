@@ -17,6 +17,7 @@ pub mod honor;
 pub mod league_session;
 pub mod loadouts;
 pub mod lobby;
+pub mod http;
 pub mod lobby_team_builder;
 pub mod login;
 pub mod loot;
@@ -41,7 +42,7 @@ pub mod summoner;
 // ============================================================================
 // 导入依赖 - 先导入父模块，再按字母顺序导入子模块类型
 // ============================================================================
-use super::http::HttpClient;
+use http::HttpClient;
 use asset::AssetHttpApi;
 use challenges::ChallengesHttpApi;
 use champ_select::ChampSelectHttpApi;

@@ -1,4 +1,4 @@
-use crate::shared::http_api::http::HttpClient;
+use crate::shared::http_api::lcu::http::HttpClient;
 use crate::shared::init::game_data::{
     get_item_icons_cache, get_perk_icons_cache, get_spell_icons_cache,
 };

@@ -1,5 +1,5 @@
 use crate::{
-    shared::http_api::http::HttpClient,
+    shared::http_api::lcu::http::HttpClient,
     shared::types::league_client::game_data::AccountScopeLoadouts,
     utils::error::http_error::HttpError,
 };

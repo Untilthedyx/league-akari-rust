@@ -1,5 +1,5 @@
 use crate::{
-    shared::http_api::http::HttpClient, utils::error::http_error::HttpError,
+    shared::http_api::lcu::http::HttpClient, utils::error::http_error::HttpError,
 };
 
 #[derive(Clone)]

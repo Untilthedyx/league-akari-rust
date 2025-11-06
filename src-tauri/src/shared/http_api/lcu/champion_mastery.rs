@@ -1,4 +1,4 @@
-use crate::shared::{http_api::http::HttpClient, types::league_client::champion_mastery::*};
+use crate::shared::{http_api::lcu::http::HttpClient, types::league_client::champion_mastery::*};
 use crate::utils::error::http_error::HttpError;
 use serde::Serialize;
 
