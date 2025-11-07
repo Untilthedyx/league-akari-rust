@@ -1,55 +1,98 @@
-import { useState, useEffect } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import Sidebar from "./components/Sidebar";
+import RecordQuery from "./pages/RecordQuery";
+import MatchAnalysis from "./pages/MatchAnalysis";
+import WCMode from "./pages/WCMode";
+import DataAnalysis from "./pages/DataAnalysis";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState(false);
+  // 禁用右键菜单和开发者工具快捷键
+  // useEffect(() => {
+  //   // 禁用右键菜单
+  //   const handleContextMenu = (e: MouseEvent) => {
+  //     e.preventDefault();
+  //     return false;
+  //   };
 
-  async function fetchClientInfo() {
-    try {
-      const result: any = await invoke("_get_client_info");
-      console.log("获取到的客户端信息:", result);
-    } catch (error) {
-      console.error("调用失败:", error);
-    }
-  }
+  //   // 禁用开发者工具快捷键
+  //   const handleKeyDown = (e: KeyboardEvent) => {
+  //     // 禁用 F12
+  //     if (e.key === "F12") {
+  //       e.preventDefault();
+  //       return false;
+  //     }
 
-  // 修正后的代码
-  useEffect(() => {
-    const timer = setInterval(async () => {
-      // 直接使用invoke的返回值，而不是依赖状态
-      const isRunning: boolean = await invoke("_is_running");
-      setGreetMsg(isRunning);
+  //     // 禁用 Ctrl+Shift+I (开发者工具)
+  //     if (e.ctrlKey && e.shiftKey && e.key === "I") {
+  //       e.preventDefault();
+  //       return false;
+  //     }
 
-      console.log("当前状态:", isRunning);
-      if (isRunning) {
-        fetchClientInfo();
-      }
-    }, 1000);
+  //     // 禁用 Ctrl+Shift+J (控制台)
+  //     if (e.ctrlKey && e.shiftKey && e.key === "J") {
+  //       e.preventDefault();
+  //       return false;
+  //     }
 
-    return () => clearInterval(timer);
-  }, []); // 仍然保持空依赖，因为我们不再依赖greetMsg
+  //     // 禁用 Ctrl+Shift+C (检查元素)
+  //     if (e.ctrlKey && e.shiftKey && e.key === "C") {
+  //       e.preventDefault();
+  //       return false;
+  //     }
+
+  //     // 禁用 Ctrl+U (查看源代码)
+  //     if (e.ctrlKey && e.key === "U") {
+  //       e.preventDefault();
+  //       return false;
+  //     }
+
+  //     // 禁用 Ctrl+S (保存页面)
+  //     if (e.ctrlKey && e.key === "S") {
+  //       e.preventDefault();
+  //       return false;
+  //     }
+
+  //     // 禁用 Ctrl+P (打印)
+  //     if (e.ctrlKey && e.key === "P") {
+  //       e.preventDefault();
+  //       return false;
+  //     }
+
+  //     // Mac 系统的快捷键 (Cmd 替代 Ctrl)
+  //     if (e.metaKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) {
+  //       e.preventDefault();
+  //       return false;
+  //     }
+  //   };
+
+  //   // 添加全局事件监听器
+  //   document.addEventListener("contextmenu", handleContextMenu);
+  //   document.addEventListener("keydown", handleKeyDown);
+
+  //   // 清理函数
+  //   return () => {
+  //     document.removeEventListener("contextmenu", handleContextMenu);
+  //     document.removeEventListener("keydown", handleKeyDown);
+  //   };
+  // }, []);
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <BrowserRouter>
+      <div className="flex h-screen w-screen overflow-hidden">
+        <Sidebar />
+        <main className="flex-1 overflow-auto bg-background">
+          <Routes>
+            <Route path="/" element={<Navigate to="/record-query" replace />} />
+            <Route path="/record-query" element={<RecordQuery />} />
+            <Route path="/match-analysis" element={<MatchAnalysis />} />
+            <Route path="/wc-mode" element={<WCMode />} />
+            <Route path="/data-analysis" element={<DataAnalysis />} />
+          </Routes>
+        </main>
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <p>{greetMsg}</p>
-    </main>
+    </BrowserRouter>
   );
 }
 

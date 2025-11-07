@@ -1,3 +1,9 @@
-pub mod http;
+// ============================================================================
+// HTTP API 模块导出
+// ============================================================================
+// 基础模块 - 通用 HTTP 和 WebSocket 客户端（无依赖）
 pub mod websocket;
-pub mod league_client;
+
+// 应用模块 - League Client API（依赖 http 模块）
+pub mod lcu;
+pub mod sgp;

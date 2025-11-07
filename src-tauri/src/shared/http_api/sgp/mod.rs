@@ -13,14 +13,18 @@ use crate::shared::types::sgp::summoner::SgpSummoner;
 use crate::utils::error::http_error::HttpError;
 
 pub struct SgpApi {
+    pub rso_platform_id: String,
     pub client: HttpClient,
 }
 
 impl SgpApi {
-    // rso_platform_id 需要大写
     pub fn new(rso_platform_id: &str, region: &str) -> Self {
         let client = HttpClient::new(rso_platform_id, region).unwrap();
-        Self { client }
+        let rso_platform_id = rso_platform_id.to_uppercase();
+        Self {
+            rso_platform_id,
+            client,
+        }
     }
 
     pub async fn get_match_history(
@@ -48,7 +52,6 @@ impl SgpApi {
     pub async fn get_game_summary(
         &self,
         game_id: i64,
-        rso_platform_id: &str,
     ) -> Result<SgpGameSummaryLol, HttpError> {
         let lcu_client = get_http_client().await.unwrap();
         let token = lcu_client
@@ -60,7 +63,7 @@ impl SgpApi {
 
         let uri = format!(
             "/match-history-query/v1/products/lol/{}_{}/SUMMARY",
-            rso_platform_id, game_id
+            self.rso_platform_id, game_id
         );
         let url = self.client.build_url(uri.as_str(), "match_history");
         self.client.get(url.as_str(), Some(&token)).await
@@ -69,7 +72,6 @@ impl SgpApi {
     pub async fn get_game_detail(
         &self,
         game_id: i64,
-        rso_platform_id: &str,
     ) -> Result<SgpGameDetailsLol, HttpError> {
         let lcu_client = get_http_client().await.unwrap();
         let token = lcu_client
@@ -81,7 +83,7 @@ impl SgpApi {
 
         let uri = format!(
             "/match-history-query/v1/products/lol/{}_{}/DETAILS",
-            rso_platform_id, game_id
+            self.rso_platform_id, game_id
         );
         let url = self.client.build_url(uri.as_str(), "match_history");
         self.client.get(url.as_str(), Some(&token)).await
@@ -103,7 +105,6 @@ impl SgpApi {
     pub async fn get_summoner_by_puuid(
         &self,
         puuid: &str,
-        rso_platform_id: &str,
     ) -> Result<Vec<SgpSummoner>, HttpError> {
         let lcu_client = get_http_client().await.unwrap();
         let token = lcu_client
@@ -114,7 +115,7 @@ impl SgpApi {
 
         let uri = format!(
             "/summoner-ledge/v1/regions/{}/summoners/puuids",
-            rso_platform_id
+            self.rso_platform_id
         );
         let url = self.client.build_url(uri.as_str(), "common");
         self.client
@@ -131,7 +132,6 @@ impl SgpApi {
     pub async fn get_spectator_gameflow_by_puuid(
         &self,
         puuid: &str,
-        rso_platform_id: &str,
     ) -> Result<SgpSpectatorData, HttpError> {
         let lcu_client = get_http_client().await.unwrap();
         let token = lcu_client
@@ -142,7 +142,7 @@ impl SgpApi {
 
         let uri = format!(
             "/gsm/v1/ledge/spectator/region/{}/puuid/{}",
-            rso_platform_id, puuid
+            self.rso_platform_id, puuid
         );
         let url = self.client.build_url(uri.as_str(), "common");
         self.client.get(url.as_str(), Some(&token)).await
@@ -152,7 +152,6 @@ impl SgpApi {
     pub async fn get_match_history_replay_stream(
         &self,
         game_id: i64,
-        rso_platform_id: &str,
     ) -> Result<Bytes, HttpError> {
         // TODO: responseType: 'stream'
         let lcu_client = get_http_client().await.unwrap();
@@ -164,7 +163,7 @@ impl SgpApi {
 
         let uri = format!(
             "/match-history-query/v3/product/lol/matchId/{}_{}/infoType/replay",
-            rso_platform_id, game_id
+            self.rso_platform_id, game_id
         );
         let url = self.client.build_url(uri.as_str(), "match_history");
         self.client.get_stream(url.as_str(), Some(&token)).await

@@ -114,30 +114,30 @@ pub struct VictimDamageDealt {
 #[serde(rename_all = "camelCase")]
 pub struct ParticipantFrames {
     #[serde(rename = "1")]
-    pub n1: n1,
+    pub n1: N1,
     #[serde(rename = "10")]
-    pub n10: n1,
+    pub n10: N1,
     #[serde(rename = "2")]
-    pub n2: n1,
+    pub n2: N1,
     #[serde(rename = "3")]
-    pub n3: n1,
+    pub n3: N1,
     #[serde(rename = "4")]
-    pub n4: n1,
+    pub n4: N1,
     #[serde(rename = "5")]
-    pub n5: n1,
+    pub n5: N1,
     #[serde(rename = "6")]
-    pub n6: n1,
+    pub n6: N1,
     #[serde(rename = "7")]
-    pub n7: n1,
+    pub n7: N1,
     #[serde(rename = "8")]
-    pub n8: n1,
+    pub n8: N1,
     #[serde(rename = "9")]
-    pub n9: n1,
+    pub n9: N1,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct n1 {
+pub struct N1 {
     pub champion_stats: ChampionStats,
     pub current_gold: i64,
     pub damage_stats: DamageStats,

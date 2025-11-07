@@ -1,0 +1,51 @@
+{
+  "common": {
+    "win": "胜利",
+    "defeat": "失败",
+    "mvp": "MVP",
+    "svp": "SVP",
+    "other": "其他",
+    "reset": "重置",
+    "all": "全部",
+    "filter": "筛选"
+  },
+  "record": {
+    "gameMode": "游戏模式",
+    "gameTime": "游戏时间",
+    "duration": "时长",
+    "damage": "伤害",
+    "damageShare": "伤害占比",
+    "damageTaken": "抗伤",
+    "damageTakenShare": "抗伤占比",
+    "healing": "治疗",
+    "healingShare": "治疗占比",
+    "kills": "击杀",
+    "deaths": "死亡",
+    "assists": "助攻",
+    "kda": "KDA"
+  },
+  "queue": {
+    "420": "单双排位",
+    "430": "匹配模式",
+    "440": "灵活排位",
+    "450": "极地大乱斗",
+    "480": "快速模式",
+    "490": "快速匹配",
+    "890": "人机",
+    "900": "无限乱斗",
+    "1700": "斗魂竞技场",
+    "1900": "无限火力",
+    "2300": "神木之门",
+    "3100": "自定义",
+    "other": "其他"
+  },
+  "filter": {
+    "queue": "游戏模式筛选",
+    "win": "胜负筛选",
+    "mvp": "最佳筛选",
+    "hero": "英雄筛选",
+    "allModes": "全部模式",
+    "allHeroes": "全部英雄"
+  }
+}
+

@@ -1,3 +1,12 @@
+## 在 mod.rs 中实现 Httpapi 和 websocket，后续直接从这里导入就好了
+
+## HttpApi
+
+在这里只需要导入
+
+```rust
+```
+
 ### OJBK Websocket 搞定了
 
 ```rust

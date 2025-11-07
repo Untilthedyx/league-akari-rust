@@ -10,6 +10,7 @@ use reqwest::{Client, Method, Response};
 use serde::{de::DeserializeOwned, de::Error as SerdeError, Serialize};
 use std::any::TypeId;
 use tracing::{error, instrument, warn, Span};
+use tungstenite::Bytes;
 
 /// SGP HTTP 客户端
 ///
@@ -23,8 +24,8 @@ use tracing::{error, instrument, warn, Span};
 /// - `client`: 配置好的 reqwest Client 实例
 #[derive(Debug, Clone)]
 pub struct HttpClient {
-    /// 基础 URL（包含协议和主机）
-    url: String,
+    /// sgp 地址
+    sgp_server_name: String,
     /// 配置好的 HTTP 客户端实例
     client: Client,
 }
@@ -41,36 +42,45 @@ impl HttpClient {
     /// - `Ok(Self)`: 成功创建客户端实例
     /// - `Err(HttpError)`: 服务器配置不存在或客户端构建失败
     ///
-    /// # 示例
-    /// ```no_run
-    /// let client = HttpClient::new(
-    ///     "HN1",
-    ///     "TENCENT",
-    /// )?;
-    /// ```
     pub fn new(rso_platform_id: &str, region: &str) -> Result<Self, HttpError> {
-        let sgp_server = format!("{}_{}", region, rso_platform_id);
-
-        let url = sgp::SGP_SERVERS
-            .get(sgp_server.as_str())
-            .ok_or_else(|| {
-                error!("SGP server not found: {}", sgp_server);
-                HttpError::NotFound(format!("SGP server '{}' not found", sgp_server))
-            })?
-            .match_history
-            .to_string();
+        let sgp_server_name = format!("{}_{}", region, rso_platform_id);
 
         let client = reqwest::Client::builder().build().map_err(|e| {
             error!("Failed to create HTTP client: {}", e);
             HttpError::HttpClientBuild(e)
         })?;
 
-        Ok(Self { url, client })
+        Ok(Self {
+            sgp_server_name,
+            client,
+        })
     }
 
-    fn build_url(&self, uri: &str) -> String {
+    pub fn get_match_history_url(&self) -> String {
+        sgp::SGP_SERVERS
+            .get(self.sgp_server_name.as_str())
+            .unwrap()
+            .match_history
+            .to_string()
+    }
+
+    pub fn get_common_url(&self) -> String {
+        sgp::SGP_SERVERS
+            .get(self.sgp_server_name.as_str())
+            .unwrap()
+            .common
+            .to_string()
+    }
+
+    pub fn build_url(&self, uri: &str, base_url_type: &str) -> String {
+        let base_url = match base_url_type {
+            "match_history" => self.get_match_history_url(),
+            "common" => self.get_common_url(),
+            _ => panic!("Invalid base URL type: {}", base_url_type),
+        };
+
         let uri = uri.trim_start_matches('/');
-        format!("{}/{}", self.url, uri)
+        format!("{}/{}", base_url, uri)
     }
 
     fn build_request(&self, method: Method, url: &str, token: Option<&str>) -> RequestBuilder {
@@ -153,7 +163,12 @@ impl HttpClient {
         // 处理响应体（根据 R 类型决定是否解析）
         if TypeId::of::<R>() == TypeId::of::<()>() {
             // 对于单元类型，不解析响应体
-            Ok(R::default())
+            // 单元类型可以从 JSON null 值反序列化
+            Ok(
+                serde_json::from_value(serde_json::Value::Null).map_err(|_| {
+                    HttpError::JsonParse(SerdeError::custom("Failed to parse unit type"))
+                })?,
+            )
         } else {
             // 先读取响应体文本，以便提供更详细的错误信息
             let text = response.text().await.map_err(|e| {
@@ -199,12 +214,12 @@ impl HttpClient {
     /// GET 请求
     /// - 无响应体：指定返回类型为 `()`
     /// - 有响应体：指定具体的返回类型
-    #[instrument(skip_all, fields(uri = %self.build_url(uri), method = "GET", status, response_data))]
-    pub async fn get<R>(&self, uri: &str, token: Option<&str>) -> Result<R, HttpError>
+    #[instrument(skip_all, fields(url = url, method = "GET", status, response_data))]
+    pub async fn get<R>(&self, url: &str, token: Option<&str>) -> Result<R, HttpError>
     where
         R: HttpData,
     {
-        self.request_json(Method::GET, uri, None::<&()>, token)
+        self.request_json(Method::GET, &url, None::<&()>, token)
             .await
     }
 
@@ -213,10 +228,10 @@ impl HttpClient {
     /// - 有请求体：传递 `Some(&data)`
     /// - 无响应体：指定返回类型为 `()`
     /// - 有响应体：指定具体的返回类型
-    #[instrument(skip_all, fields(uri = %self.build_url(uri), method = "POST", status, response_data))]
+    #[instrument(skip_all, fields(url = url, method = "POST", status, response_data))]
     pub async fn post<T, R>(
         &self,
-        uri: &str,
+        url: &str,
         json: Option<&T>,
         token: Option<&str>,
     ) -> Result<R, HttpError>
@@ -224,7 +239,7 @@ impl HttpClient {
         T: Serialize,
         R: HttpData,
     {
-        self.request_json(Method::POST, uri, json, token).await
+        self.request_json(Method::POST, &url, json, token).await
     }
 
     /// PATCH 请求
@@ -232,10 +247,10 @@ impl HttpClient {
     /// - 有请求体：传递 `Some(&data)`
     /// - 无响应体：指定返回类型为 `()`
     /// - 有响应体：指定具体的返回类型
-    #[instrument(skip_all, fields(uri = %self.build_url(uri), method = "PATCH", status, response_data))]
+    #[instrument(skip_all, fields(url = url, method = "PATCH", status, response_data))]
     pub async fn patch<T, R>(
         &self,
-        uri: &str,
+        url: &str,
         json: Option<&T>,
         token: Option<&str>,
     ) -> Result<R, HttpError>
@@ -243,7 +258,7 @@ impl HttpClient {
         T: Serialize,
         R: HttpData,
     {
-        self.request_json(Method::PATCH, uri, json, token).await
+        self.request_json(Method::PATCH, &url, json, token).await
     }
 
     /// PUT 请求
@@ -251,10 +266,10 @@ impl HttpClient {
     /// - 有请求体：传递 `Some(&data)`
     /// - 无响应体：指定返回类型为 `()`
     /// - 有响应体：指定具体的返回类型
-    #[instrument(skip_all, fields(uri = %self.build_url(uri), method = "PUT", status, response_data))]
+    #[instrument(skip_all, fields(url = url, method = "PUT", status, response_data))]
     pub async fn put<T, R>(
         &self,
-        uri: &str,
+        url: &str,
         json: Option<&T>,
         token: Option<&str>,
     ) -> Result<R, HttpError>
@@ -262,7 +277,7 @@ impl HttpClient {
         T: Serialize,
         R: HttpData,
     {
-        self.request_json(Method::PUT, uri, json, token).await
+        self.request_json(Method::PUT, &url, json, token).await
     }
 
     /// DELETE 请求
@@ -270,10 +285,10 @@ impl HttpClient {
     /// - 有请求体：传递 `Some(&data)`
     /// - 无响应体：指定返回类型为 `()`
     /// - 有响应体：指定具体的返回类型
-    #[instrument(skip_all, fields(uri = %self.build_url(uri), method = "DELETE", status, response_data))]
+    #[instrument(skip_all, fields(url = url, method = "DELETE", status, response_data))]
     pub async fn delete<T, R>(
         &self,
-        uri: &str,
+        url: &str,
         json: Option<&T>,
         token: Option<&str>,
     ) -> Result<R, HttpError>
@@ -281,10 +296,24 @@ impl HttpClient {
         T: Serialize,
         R: HttpData,
     {
-        self.request_json(Method::DELETE, uri, json, token).await
+        self.request_json(Method::DELETE, &url, json, token).await
+    }
+
+    /// 获取流式响应
+    pub async fn get_stream(&self, url: &str, token: Option<&str>) -> Result<Bytes, HttpError> {
+        let response = self
+            .build_request(Method::GET, &url, token)
+            .send()
+            .await
+            .map_err(|e| HttpError::HttpRequest(e))?;
+        let bytes = response
+            .bytes()
+            .await
+            .map_err(|e| HttpError::HttpRequest(e))?;
+        Ok(bytes)
     }
 }
 
-pub trait HttpData: Serialize + DeserializeOwned + Default + 'static {}
+pub trait HttpData: Serialize + DeserializeOwned + 'static {}
 
-impl<T> HttpData for T where T: Serialize + DeserializeOwned + Default + 'static {}
+impl<T> HttpData for T where T: Serialize + DeserializeOwned + 'static {}

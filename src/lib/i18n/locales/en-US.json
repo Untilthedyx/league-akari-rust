@@ -1,0 +1,49 @@
+{
+  "common": {
+    "win": "Win",
+    "defeat": "Defeat",
+    "mvp": "MVP",
+    "reset": "Reset",
+    "all": "All",
+    "filter": "Filter"
+  },
+  "record": {
+    "gameMode": "Game Mode",
+    "gameTime": "Game Time",
+    "duration": "Duration",
+    "damage": "Damage",
+    "damageShare": "Damage Share",
+    "damageTaken": "Damage Taken",
+    "damageTakenShare": "Damage Taken Share",
+    "healing": "Healing",
+    "healingShare": "Healing Share",
+    "kills": "Kills",
+    "deaths": "Deaths",
+    "assists": "Assists",
+    "kda": "KDA"
+  },
+  "queue": {
+    "420": "Ranked Solo/Duo",
+    "430": "Normal",
+    "440": "Ranked Flex",
+    "450": "ARAM",
+    "480": "Quick Mode",
+    "490": "Quick Match",
+    "890": "Bot",
+    "900": "URF",
+    "1700": "Arena",
+    "1900": "URF",
+    "2300": "Arena of Souls",
+    "3100": "Custom",
+    "other": "Other"
+  },
+  "filter": {
+    "gameMode": "Game Mode Filter",
+    "win": "Win/Loss Filter",
+    "mvp": "MVP Filter",
+    "hero": "Hero Filter",
+    "allModes": "All Modes",
+    "allHeroes": "All Heroes"
+  }
+}
+

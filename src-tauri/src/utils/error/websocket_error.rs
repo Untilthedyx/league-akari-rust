@@ -15,4 +15,6 @@ pub enum WebsocketError {
     Send(SendError),
     #[error("Channel closed")]
     ChannelClosed,
+    #[error("Failed to parse CA certificate: {0}")]
+    CertificateParse(native_tls::Error),
 }

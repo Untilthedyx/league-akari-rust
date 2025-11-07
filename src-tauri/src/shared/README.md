@@ -131,10 +131,10 @@ shared/
 ### 基本 API 调用
 
 ```rust
-use crate::shared::http_api::league_client::LeagueClientHttpApiAxiosHelper;
+use crate::shared::http_api::league_client::LcuApi;
 
 // 初始化 API
-let api = LeagueClientHttpApiAxiosHelper::new(port, token, true);
+let api = LcuApi::new(port, token, true);
 
 // 获取召唤师信息
 let summoner = api.summoner.get_current_summoner().await?;
@@ -174,7 +174,7 @@ monitor::start_game_state_monitor(app_handle).await;
 1. 在 `http_api/league_client/` 创建新的 API 文件
 2. 在 `types/league_client/` 创建对应的类型文件
 3. 在 `http_api/league_client/mod.rs` 中注册新模块
-4. 在 `LeagueClientHttpApiAxiosHelper` 中添加字段
+4. 在 `LcuApi` 中添加字段
 
 ### 添加新的工具功能
 

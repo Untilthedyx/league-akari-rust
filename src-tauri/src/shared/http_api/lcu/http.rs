@@ -44,15 +44,6 @@ impl HttpClient {
     /// # 返回
     /// - `Ok(Self)`: 成功创建客户端实例
     /// - `Err(HttpError)`: 证书解析失败或客户端构建失败
-    ///
-    /// # 示例
-    /// ```no_run
-    /// let client = HttpClient::new(
-    ///     "https://127.0.0.1".to_string(),
-    ///     2999,
-    ///     "your-auth-token".to_string()
-    /// )?;
-    /// ```
     pub fn new(url: String, port: u32, token: String) -> Result<Self, HttpError> {
         // 构建完整的 URL（包含端口）
         let url = format!("{}:{}", url, port);
@@ -86,15 +77,8 @@ impl HttpClient {
         format!("{}/{}", self.url, uri)
     }
 
-    fn build_request(&self, method: Method, url: &str, token: Option<&str>) -> RequestBuilder {
-        match token {
-            Some(token) => {
-                let mut builder = self.client.request(method, url);
-                builder = builder.header("Authorization", format!("Bearer {}", token));
-                builder
-            }
-            None => self.client.request(method, url),
-        }
+    fn build_request(&self, method: Method, url: &str) -> RequestBuilder {
+        self.client.request(method, url)
     }
 
     async fn check_response(
@@ -144,7 +128,7 @@ impl HttpClient {
         T: Serialize,
         R: HttpData,
     {
-        let builder = self.build_request(method, url, None);
+        let builder = self.build_request(method, url);
 
         // 处理请求体
         let response = match json {
@@ -216,7 +200,8 @@ impl HttpClient {
     where
         R: HttpData,
     {
-        self.request_json(Method::GET, uri, None::<&()>).await
+        let url = self.build_url(uri);
+        self.request_json(Method::GET, &url, None::<&()>).await
     }
 
     /// POST 请求
@@ -230,7 +215,8 @@ impl HttpClient {
         T: Serialize,
         R: HttpData,
     {
-        self.request_json(Method::POST, uri, json).await
+        let url = self.build_url(uri);
+        self.request_json(Method::POST, &url, json).await
     }
 
     /// PATCH 请求
@@ -244,7 +230,8 @@ impl HttpClient {
         T: Serialize,
         R: HttpData,
     {
-        self.request_json(Method::PATCH, uri, json).await
+        let url = self.build_url(uri);
+        self.request_json(Method::PATCH, &url, json).await
     }
 
     /// PUT 请求
@@ -258,7 +245,8 @@ impl HttpClient {
         T: Serialize,
         R: HttpData,
     {
-        self.request_json(Method::PUT, uri, json).await
+        let url = self.build_url(uri);
+        self.request_json(Method::PUT, &url, json).await
     }
 
     /// DELETE 请求
@@ -272,7 +260,30 @@ impl HttpClient {
         T: Serialize,
         R: HttpData,
     {
-        self.request_json(Method::DELETE, uri, json).await
+        let url = self.build_url(uri);
+        self.request_json(Method::DELETE, &url, json).await
+    }
+
+    pub async fn get_image(&self, uri: &str) -> Result<(Vec<u8>, String), HttpError> {
+        let url = self.build_url(uri);
+        let response = self
+            .client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|e| HttpError::HttpRequest(e))?;
+        let content_type = response
+            .headers()
+            .get("content-type")
+            .and_then(|v| v.to_str().ok())
+            .unwrap_or("image/png")
+            .to_string();
+        let bytes = response
+            .bytes()
+            .await
+            .map_err(|e| HttpError::HttpRequest(e))?
+            .to_vec();
+        return Ok((bytes, content_type));
     }
 }
 

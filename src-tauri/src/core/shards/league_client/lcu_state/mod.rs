@@ -25,7 +25,7 @@ use crate::core::shards::league_client::lcu_state::matchmaking::MatchmakingState
 use crate::core::shards::league_client::lcu_state::summoner::SummonerStateLock;
 
 #[derive(Debug, Default)]
-pub struct LeagueClientUxState {
+pub struct LeagueClientState {
     pub gameflow: GameflowStateLock,
     pub chat: ChatStateLock,
     pub honor: HonorStateLock,
@@ -40,7 +40,7 @@ pub struct LeagueClientUxState {
     pub lobby_team_builder: LobbyTeamBuilderStateLock,
 }
 
-impl LeagueClientUxState {
+impl LeagueClientState {
     pub fn new() -> Self {
         Self::default()
     }

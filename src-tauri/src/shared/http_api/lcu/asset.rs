@@ -27,11 +27,6 @@ impl AssetHttpApi {
     /// - Base64 编码的图片数据 URL，可直接用于 `<img src="...">`
     /// - 格式：`data:image/jpeg;base64,...`
     ///
-    /// # 示例
-    /// ```rust
-    /// let base64_img = asset_api.get_profile_icon_base64(1234).await?;
-    /// // 前端可以直接使用: <img src={base64_img} />
-    /// ```
     pub async fn get_profile_icon_base64(&self, icon_id: u32) -> Result<String, HttpError> {
         let uri = format!("/lol-game-data/assets/v1/profile-icons/{}.jpg", icon_id);
         self.get_image_as_base64(&uri).await
@@ -153,4 +148,5 @@ impl AssetHttpApi {
         // 返回 Data URL 格式
         Ok(format!("data:{};base64,{}", content_type, base64_str))
     }
+
 }

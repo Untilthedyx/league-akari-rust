@@ -133,33 +133,49 @@ pub struct Item {
     /// 物品描述
     pub description: String,
     /// 是否为主动物品
+    #[serde(default)]
     pub active: bool,
     /// 是否在商店中可购买
+    #[serde(default)]
     pub in_store: bool,
     /// 合成所需物品ID列表
+    #[serde(default)]
     pub from: Vec<u32>,
     /// 可合成的物品ID列表
+    #[serde(default)]
     pub to: Vec<u32>,
     /// 物品分类
+    #[serde(default)]
     pub categories: Vec<String>,
     /// 最大堆叠数量
+    #[serde(default)]
     pub max_stacks: u32,
     /// 所需英雄（特定英雄专属）
+    #[serde(default)]
     pub required_champion: String,
     /// 所需友方英雄（特定组合）
+    #[serde(default)]
     pub required_ally: String,
     /// 所需buff货币名称
+    #[serde(default)]
     pub required_buff_currency_name: String,
-    /// 所需buff货币数量
-    pub required_buff_currency_cost: u32,
-    /// 特殊配方ID
-    pub special_recipe: u32,
+    /// 所需buff货币数量（可能为负数）
+    #[serde(default)]
+    pub required_buff_currency_cost: i32,
+    /// 特殊配方ID（-2 表示没有特殊配方）
+    #[serde(default)]
+    pub special_recipe: i32,
     /// 是否为附魔
+    #[serde(default)]
     pub is_enchantment: bool,
     /// 基础价格
+    #[serde(default)]
     pub price: u32,
     /// 总价格（含合成材料）
+    #[serde(default)]
     pub price_total: u32,
+    /// 是否在物品套装中显示
+    pub display_in_item_sets: Option<bool>,
     /// 图标路径
     pub icon_path: String,
 }
