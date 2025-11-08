@@ -1,4 +1,4 @@
-use crate::shared::init::http::get_http_client;
+use crate::shared::init::lcu::get_lcu_client;
 use tauri::Runtime;
 
 /// 获取召唤师头像图标（Base64 编码）
@@ -14,7 +14,7 @@ pub async fn get_profile_icon<R: Runtime>(
     _window: tauri::Window<R>,
     icon_id: u32,
 ) -> Result<String, String> {
-    let client = get_http_client().await.map_err(|e| e.to_string())?;
+    let client = get_lcu_client().await.map_err(|e| e.to_string())?;
     client
         .asset
         .get_profile_icon_base64(icon_id)
@@ -35,7 +35,7 @@ pub async fn get_champion_icon<R: Runtime>(
     _window: tauri::Window<R>,
     champion_id: u32,
 ) -> Result<String, String> {
-    let client = get_http_client().await.map_err(|e| e.to_string())?;
+    let client = get_lcu_client().await.map_err(|e| e.to_string())?;
     client
         .asset
         .get_champion_icon_base64(champion_id)
@@ -56,7 +56,7 @@ pub async fn get_item_icon<R: Runtime>(
     _window: tauri::Window<R>,
     item_id: u32,
 ) -> Result<String, String> {
-    let client = get_http_client().await.map_err(|e| e.to_string())?;
+    let client = get_lcu_client().await.map_err(|e| e.to_string())?;
     client
         .asset
         .get_item_icon_base64(item_id)
@@ -77,7 +77,7 @@ pub async fn get_spell_icon<R: Runtime>(
     _window: tauri::Window<R>,
     spell_id: String,
 ) -> Result<String, String> {
-    let client = get_http_client().await.map_err(|e| e.to_string())?;
+    let client = get_lcu_client().await.map_err(|e| e.to_string())?;
     client
         .asset
         .get_spell_icon_base64(&spell_id)
@@ -98,7 +98,7 @@ pub async fn get_perk_icon<R: Runtime>(
     _window: tauri::Window<R>,
     perk_id: String,
 ) -> Result<String, String> {
-    let client = get_http_client().await.map_err(|e| e.to_string())?;
+    let client = get_lcu_client().await.map_err(|e| e.to_string())?;
     client
         .asset
         .get_perk_icon_base64(&perk_id)

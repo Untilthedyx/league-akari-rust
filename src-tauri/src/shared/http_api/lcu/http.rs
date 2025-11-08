@@ -162,13 +162,14 @@ impl HttpClient {
             // 尝试解析 JSON
             let data: R = serde_json::from_str(&text).map_err(|e| {
                 // 如果解析失败，尝试提供更详细的错误信息
-                let error_msg = if text.len() > 1000 {
+                let error_msg = if text.chars().nth(1000).is_some() {
+                    let text_preview = text.chars().take(1000).collect::<String>();
                     format!(
                         "Failed to parse JSON response at line {} column {}: {}. Response preview: {}...",
                         e.line(),
                         e.column(),
                         e,
-                        &text[..10000]
+                        text_preview
                     )
                 } else {
                     format!(

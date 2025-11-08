@@ -2,6 +2,7 @@ use crate::core::app_init::init_and_clear::{clear_state, init_state};
 use crate::shared::process::is_running;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use tauri::Manager;
 use tokio::sync::watch;
 use tokio::time::{interval, Duration};
 
@@ -14,6 +15,16 @@ pub struct AppState {
     /// 状态变化通知通道的接收端（线程安全，不需要 Mutex）
     /// 注意：如果需要多个监听者，应该克隆 receiver 而不是共享
     open_receiver: Arc<watch::Receiver<bool>>,
+}
+
+pub fn app_setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    app.manage(AppState::default());
+    let app_handle = app.handle().clone();
+    tauri::async_runtime::spawn(async move {
+        let app_state = app_handle.state::<AppState>();
+        app_state.init().await;
+    });
+    Ok(())
 }
 
 impl Default for AppState {

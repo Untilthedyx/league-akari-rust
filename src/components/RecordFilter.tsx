@@ -25,10 +25,9 @@ export default function RecordFilter({
   // 游戏模式选项（从 records 中提取唯一的 queueId）
   const gameModeOptions: SelectOption[] = useMemo(() => {
     const options: SelectOption[] = [
-      { value: "", label: t("filter.allModes") },
+      { value: "", label: t("filter.all") },
     ];
 
-    // 从 records 中提取所有唯一的 queueId
     const uniqueQueueIds = Array.from(
       new Set(records.map((record) => record.queueId))
     ).sort((a, b) => a - b);
@@ -41,12 +40,12 @@ export default function RecordFilter({
     });
 
     return options;
-  }, [records]);
+  }, [records, t]);
 
   // 胜负选项
   const winOptions: SelectOption[] = useMemo(
     () => [
-      { value: "", label: t("common.all") },
+      { value: "", label: t("filter.all") },
       { value: "true", label: t("common.win") },
       { value: "false", label: t("common.defeat") },
     ],
@@ -56,7 +55,7 @@ export default function RecordFilter({
   // MVP选项
   const mvpOptions: SelectOption[] = useMemo(
     () => [
-      { value: "", label: t("common.all") },
+      { value: "", label: t("filter.all") },
       { value: "mvp", label: t("common.mvp") },
       { value: "svp", label: t("common.svp") },
       { value: "other", label: t("common.other") },
@@ -64,15 +63,26 @@ export default function RecordFilter({
     []
   );
 
-  // 英雄列表（从 records 中提取唯一的英雄名称）
+  // 英雄列表（从 records 的所有 participants 中提取唯一的英雄名称，根据 puuid 筛选）
   const heroOptions: SelectOption[] = useMemo(() => {
     const options: SelectOption[] = [
-      { value: "", label: t("filter.allHeroes") },
+      { value: "", label: t("filter.all") },
     ];
 
-    // 从 records 中提取所有唯一的英雄名称
+    // 从所有 records 的所有 participants 中，找到与 record.puuid 匹配的 participant
+    // 然后提取唯一的英雄名称
     const uniqueHeroes = Array.from(
-      new Set(records.map((record) => record.champion.hero))
+      new Set(
+        records
+          .map((record) => {
+            // 找到与 record.puuid 匹配的 participant
+            const participant = record.participants.find(
+              (p) => p.puuid === record.puuid
+            );
+            return participant?.champion.name;
+          })
+          .filter((name): name is string => !!name) // 过滤掉 undefined
+      )
     ).sort();
 
     uniqueHeroes.forEach((hero) => {
@@ -83,7 +93,7 @@ export default function RecordFilter({
     });
 
     return options;
-  }, [records]);
+  }, [records, t]);
 
   const handleGameModeChange = (value: string) => {
     const newFilters = {
@@ -137,7 +147,7 @@ export default function RecordFilter({
         options={gameModeOptions}
         value={filters.queueId?.toString() || ""}
         onChange={handleGameModeChange}
-        placeholder={t("filter.queue")}
+        placeholder={t("filter.gameMode")}
         className="w-[180px]"
       />
 
@@ -146,7 +156,7 @@ export default function RecordFilter({
         options={winOptions}
         value={filters.win || ""}
         onChange={handleWinChange}
-        placeholder={t("filter.win")}
+        placeholder={t("filter.result")}
         className="w-[140px]"
       />
 
@@ -155,7 +165,7 @@ export default function RecordFilter({
         options={mvpOptions}
         value={filters.mvp || ""}
         onChange={handleMVPChange}
-        placeholder={t("filter.mvp")}
+        placeholder={t("filter.bestPlayer")}
         className="w-[140px]"
       />
 
@@ -164,7 +174,7 @@ export default function RecordFilter({
         options={heroOptions}
         value={filters.hero || ""}
         onChange={handleHeroChange}
-        placeholder={t("filter.hero")}
+        placeholder={t("filter.selectHero")}
         className="w-[140px]"
       />
 

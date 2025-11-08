@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import PlayerInfo, { PlayerData } from "@/components/PlayerInfo";
 import RecordFilter, { FilterOptions } from "@/components/RecordFilter";
 import RecordList from "@/components/RecordList";
@@ -102,7 +102,6 @@ const generateMockPlayer = (): PlayerData => {
 export default function RecordQuery() {
   const [player] = useState<PlayerData>(generateMockPlayer());
   const [records, setRecords] = useState<RecordItem[]>([]);
-  const [recordsFilter, setRecordsFilter] = useState<RecordItem[]>([]);
   const [filters, setFilters] = useState<FilterOptions>({});
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -114,9 +113,6 @@ export default function RecordQuery() {
 
     setIsLoading(true);
     try {
-      // 模拟API请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
       const begIndex = currentIndexRef.current;
       const endIndex = begIndex + 19;
 
@@ -127,20 +123,22 @@ export default function RecordQuery() {
       );
 
       setRecords((prev) => {
-        const totalLength = prev.length + newRecords.length;
-        if (newRecords.length === 0 || totalLength >= 50) {
-          setHasMore(false);
-        }
-        // 更新索引引用
+        // 合并新数据，去重
+        let records = [...prev, ...newRecords];
+        records = records.filter((record, index, self) =>
+          index === self.findIndex((t) => t.gameId === record.gameId)
+        );
+        const totalLength = records.length;
+
+        // 更新索引：使用去重后的实际长度
         currentIndexRef.current = totalLength;
-        return [...prev, ...newRecords];
-      });
-      setRecordsFilter((prev) => {
-        const totalLength = prev.length + newRecords.length;
-        if (newRecords.length === 0 || totalLength >= 50) {
+
+        // 如果返回的数据少于请求的数量，或者达到上限，标记为没有更多数据
+        if (newRecords.length === 0 || newRecords.length < (endIndex - begIndex + 1)) {
           setHasMore(false);
         }
-        return [...prev, ...newRecords];
+
+        return records;
       });
     } catch (error) {
       console.error("获取战绩列表失败:", error);
@@ -150,35 +148,73 @@ export default function RecordQuery() {
     }
   }, [isLoading, hasMore]);
 
-  // 筛选变化时重置列表
-  useEffect(() => {
-    setRecordsFilter(handleFilter(records, filters));
-  }, [filters, records]);
+  // 筛选逻辑（使用 useMemo 优化性能）
+  const recordsFilter = useMemo(() => {
+    // 如果没有筛选条件，直接返回所有记录
+    const hasFilters =
+      filters.queueId !== undefined ||
+      filters.win ||
+      filters.mvp ||
+      filters.hero;
+    
+    if (!hasFilters) {
+      return records;
+    }
 
-  const handleFilter = (records: RecordItem[], filters: FilterOptions) => {
-    let filteredRecords = [...records];
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value === undefined || value === "") {
-        return;
-      }
-      if (key === "queueId") {
-        filteredRecords = filteredRecords.filter((record) => record.queueId === value);
-      } else if (key === "win") {
-        filteredRecords = filteredRecords.filter((record) => record.isWin.toString() === value);
-      } else if (key === "mvp") {
-        if (value === "mvp") {
-          filteredRecords = filteredRecords.filter((record) => record.isBest && record.isWin);
-        } else if (value === "svp") {
-          filteredRecords = filteredRecords.filter((record) => record.isBest && !record.isWin);
-        } else if (value === "other") {
-          filteredRecords = filteredRecords.filter((record) => !record.isBest);
+    // 预处理：为每个 record 创建 participant 映射，避免重复查找
+    const recordsWithParticipant = records
+      .map((record) => {
+        const participant = record.participants.find(
+          (p) => p.puuid === record.puuid
+        );
+        return { record, participant };
+      })
+      .filter((item): item is { record: RecordItem; participant: NonNullable<typeof item.participant> } => 
+        item.participant !== undefined
+      );
+
+    let filtered = recordsWithParticipant;
+
+    // 根据 queueId 筛选
+    if (filters.queueId !== undefined) {
+      filtered = filtered.filter(
+        (item) => item.record.queueId === filters.queueId
+      );
+    }
+
+    // 根据 win 筛选
+    if (filters.win) {
+      filtered = filtered.filter((item) => {
+        return filters.win === "true"
+          ? item.participant.win
+          : !item.participant.win;
+      });
+    }
+
+    // 根据 mvp 筛选
+    if (filters.mvp) {
+      filtered = filtered.filter((item) => {
+        if (filters.mvp === "mvp") {
+          return item.participant.best && item.participant.win;
+        } else if (filters.mvp === "svp") {
+          return item.participant.best && !item.participant.win;
+        } else if (filters.mvp === "other") {
+          return !item.participant.best;
         }
-      } else if (key === "hero") {
-        filteredRecords = filteredRecords.filter((record) => record.champion.hero === value);
-      }
-    });
-    return filteredRecords;
-  };
+        return true;
+      });
+    }
+
+    // 根据 hero 筛选
+    if (filters.hero) {
+      filtered = filtered.filter(
+        (item) => item.participant.champion.name === filters.hero
+      );
+    }
+
+    // 只返回 record 数组
+    return filtered.map((item) => item.record);
+  }, [records, filters]);
 
   // 初始加载
   useEffect(() => {

@@ -1,9 +1,7 @@
 pub mod http;
 
-use tungstenite::Bytes;
-
 use crate::shared::http_api::sgp::http::HttpClient;
-use crate::shared::init::http::get_http_client;
+use crate::shared::init::lcu::get_lcu_client;
 use crate::shared::types::sgp::game_detail::SgpGameDetailsLol;
 use crate::shared::types::sgp::game_summary::SgpGameSummaryLol;
 use crate::shared::types::sgp::history::SgpMatchHistoryLol;
@@ -11,7 +9,9 @@ use crate::shared::types::sgp::rank_stats::SgpRankedStats;
 use crate::shared::types::sgp::spectator_data::SgpSpectatorData;
 use crate::shared::types::sgp::summoner::SgpSummoner;
 use crate::utils::error::http_error::HttpError;
+use tungstenite::Bytes;
 
+#[derive(Debug, Clone)]
 pub struct SgpApi {
     pub rso_platform_id: String,
     pub client: HttpClient,
@@ -33,7 +33,7 @@ impl SgpApi {
         start_index: i32,
         count: i32,
     ) -> Result<SgpMatchHistoryLol, HttpError> {
-        let lcu_client = get_http_client().await.unwrap();
+        let lcu_client = get_lcu_client().await.unwrap();
         let token = lcu_client
             .entitlements
             .get_entitlements_token()
@@ -49,11 +49,8 @@ impl SgpApi {
         self.client.get(url.as_str(), Some(&token)).await
     }
 
-    pub async fn get_game_summary(
-        &self,
-        game_id: i64,
-    ) -> Result<SgpGameSummaryLol, HttpError> {
-        let lcu_client = get_http_client().await.unwrap();
+    pub async fn get_game_summary(&self, game_id: i64) -> Result<SgpGameSummaryLol, HttpError> {
+        let lcu_client = get_lcu_client().await.unwrap();
         let token = lcu_client
             .entitlements
             .get_entitlements_token()
@@ -69,11 +66,8 @@ impl SgpApi {
         self.client.get(url.as_str(), Some(&token)).await
     }
 
-    pub async fn get_game_detail(
-        &self,
-        game_id: i64,
-    ) -> Result<SgpGameDetailsLol, HttpError> {
-        let lcu_client = get_http_client().await.unwrap();
+    pub async fn get_game_detail(&self, game_id: i64) -> Result<SgpGameDetailsLol, HttpError> {
+        let lcu_client = get_lcu_client().await.unwrap();
         let token = lcu_client
             .entitlements
             .get_entitlements_token()
@@ -90,7 +84,7 @@ impl SgpApi {
     }
 
     pub async fn get_ranked_stats(&self, puuid: &str) -> Result<SgpRankedStats, HttpError> {
-        let lcu_client = get_http_client().await.unwrap();
+        let lcu_client = get_lcu_client().await.unwrap();
         let token = lcu_client
             .league_session
             .get_league_session_token()
@@ -102,11 +96,8 @@ impl SgpApi {
         self.client.get(url.as_str(), Some(&token)).await
     }
 
-    pub async fn get_summoner_by_puuid(
-        &self,
-        puuid: &str,
-    ) -> Result<Vec<SgpSummoner>, HttpError> {
-        let lcu_client = get_http_client().await.unwrap();
+    pub async fn get_summoner_by_puuid(&self, puuid: &str) -> Result<Vec<SgpSummoner>, HttpError> {
+        let lcu_client = get_lcu_client().await.unwrap();
         let token = lcu_client
             .league_session
             .get_league_session_token()
@@ -133,7 +124,7 @@ impl SgpApi {
         &self,
         puuid: &str,
     ) -> Result<SgpSpectatorData, HttpError> {
-        let lcu_client = get_http_client().await.unwrap();
+        let lcu_client = get_lcu_client().await.unwrap();
         let token = lcu_client
             .league_session
             .get_league_session_token()
@@ -149,12 +140,9 @@ impl SgpApi {
     }
 
     // /// Readable 需要处理
-    pub async fn get_match_history_replay_stream(
-        &self,
-        game_id: i64,
-    ) -> Result<Bytes, HttpError> {
+    pub async fn get_match_history_replay_stream(&self, game_id: i64) -> Result<Bytes, HttpError> {
         // TODO: responseType: 'stream'
-        let lcu_client = get_http_client().await.unwrap();
+        let lcu_client = get_lcu_client().await.unwrap();
         let token = lcu_client
             .league_session
             .get_league_session_token()

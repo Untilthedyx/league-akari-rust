@@ -1,10 +1,29 @@
+# TODO List
+
+- [x] 使用 tauri 专用的 log 系统，不使用，tauri_plugin_log 不支持 tracing
 - [ ] 战绩查询(任意玩家)
+  - [ ] 移动到图标上显示图标名称
+  - [ ] 筛选时很卡顿
 - [ ] 数据分析(任意玩家)
 - [ ] WC 模式，自动选禁英雄，自动配置铭文，自动带技能(自动基于本人数据或者 OPGG 游戏数据)
 - [ ] 对局分析
-- [ ] lcu 获取战绩不稳定 战绩获取 https://github.com/ShawnRZ/show-me/blob/
+- [ ] lcu 获取战绩不稳定 战绩获取参考 [show_me](https://github.com/ShawnRZ/show-me/blob/)
+  - [x] 构建 sgp 接口 - 2025/11/06
+  - [ ] 分析 sgp 接口数据并搭建后端信息
+  - [ ] 更新前端展示
 - [ ] websocket 配置证书
-- [x] http.rs 参数重构
-- [ ] sgp token 随时间是变化的，可能需要没发送一次请求更新一下
-- [ ] 图片 get_image 失效了 在 asset.rs 文件中
-- [ ] sgp 还有 base_url 需要处理 common 和 history
+- [x] http.rs 参数重构 - 2025/11/06
+- [x] sgp token 随时间是变化的，可能需要每发送一次请求更新一下 - 2025/11/06
+- [x] 图片 get_image 失效了 在 asset.rs 文件中 - 2025/11/06
+- [x] sgp 还有 base_url 需要处理 common 和 history - 2025/11/06
+- [x] json 解析使用字符而不是字节 - 2025/11/07
+- [x] 初始化操作
+  - [x] 添加 sgp 到初始化中 - 2025/11/07
+  - [x] 扩充 英雄，装备，符文信息 - 2025/11/07
+- [ ] 加上 history 的 lcu 默认接口
+- [ ] 酌情可以删去 history match 的 puuid 字段，因为请求就已经用到了
+
+## 开发
+
+1. 先实现再重构，别 TM 一直想着怎么重构，跟个傻逼似的一行代码也不敲
+2. 先看前端需要实现什么功能再写 TM 的后端，别 TM 的本末倒置了

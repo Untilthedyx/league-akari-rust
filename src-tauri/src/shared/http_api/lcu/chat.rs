@@ -3,7 +3,7 @@
 
 use crate::shared::{
     http_api::lcu::http::HttpClient, // 通用 HTTP 客户端
-    types::league_client::chat::*, // 聊天相关数据结构（Friend、Conversation 等）
+    types::league_client::chat::*,   // 聊天相关数据结构（Friend、Conversation 等）
 };
 use crate::utils::error::http_error::HttpError; // HTTP 错误类型
 use serde::Serialize; // 用于 JSON 序列化
@@ -104,14 +104,14 @@ impl ChatHttpApi {
         /// 消息发送请求体
         #[derive(Serialize)]
         struct Payload {
-            body: String,               // 消息内容
-            from_id: Option<u64>,       // 发送者 ID（可选）
-            from_pid: String,           // 发送者平台 ID（暂为空）
-            from_summoner_id: u64,      // 发送者召唤师 ID（默认 0）
-            id: String,                 // 目标会话 ID
-            is_historical: bool,        // 是否为历史消息
-            timestamp: String,          // 时间戳（暂为空，由服务端填充）
-            r#type: String,             // 消息类型
+            body: String,          // 消息内容
+            from_id: Option<u64>,  // 发送者 ID（可选）
+            from_pid: String,      // 发送者平台 ID（暂为空）
+            from_summoner_id: u64, // 发送者召唤师 ID（默认 0）
+            id: String,            // 目标会话 ID
+            is_historical: bool,   // 是否为历史消息
+            timestamp: String,     // 时间戳（暂为空，由服务端填充）
+            r#type: String,        // 消息类型
         }
 
         // 将目标 ID 转换为字符串（支持数字或字符串类型的 ID）
@@ -158,8 +158,8 @@ impl ChatHttpApi {
         /// 排位信息子结构
         #[derive(Serialize)]
         struct LolData {
-            ranked_league_queue: String,    // 排位队列
-            ranked_league_tier: String,     // 段位等级
+            ranked_league_queue: String,            // 排位队列
+            ranked_league_tier: String,             // 段位等级
             ranked_league_division: Option<String>, // 段位细分（可选）
         }
 
@@ -189,9 +189,9 @@ impl ChatHttpApi {
         /// 好友请求体
         #[derive(Serialize)]
         struct Payload {
-            game_name: String,  // 游戏名称
-            tag_line: String,   // 标签
-            game_tag: String,   // 游戏标签（与 tag_line 一致）
+            game_name: String, // 游戏名称
+            tag_line: String,  // 标签
+            game_tag: String,  // 游戏标签（与 tag_line 一致）
         }
 
         let url = "/lol-chat/v2/friend-requests";

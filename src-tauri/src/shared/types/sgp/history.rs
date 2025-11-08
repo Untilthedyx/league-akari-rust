@@ -50,35 +50,37 @@ pub struct Json {
     pub season_id: i64,
     pub teams: Vec<Team>,
     pub tournament_code: String,
+    #[serde(default)]
+    pub game_mode_mutators: Vec<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Participant {
     #[serde(rename = "PlayerScore0")]
-    pub player_score0: f64,
+    pub player_score0: Option<f64>,
     #[serde(rename = "PlayerScore1")]
-    pub player_score1: f64,
+    pub player_score1: Option<f64>,
     #[serde(rename = "PlayerScore10")]
-    pub player_score10: f64,
+    pub player_score10: Option<f64>,
     #[serde(rename = "PlayerScore11")]
-    pub player_score11: f64,
+    pub player_score11: Option<f64>,
     #[serde(rename = "PlayerScore2")]
-    pub player_score2: f64,
+    pub player_score2: Option<f64>,
     #[serde(rename = "PlayerScore3")]
-    pub player_score3: f64,
+    pub player_score3: Option<f64>,
     #[serde(rename = "PlayerScore4")]
-    pub player_score4: f64,
+    pub player_score4: Option<f64>,
     #[serde(rename = "PlayerScore5")]
-    pub player_score5: f64,
+    pub player_score5: Option<f64>,
     #[serde(rename = "PlayerScore6")]
-    pub player_score6: f64,
+    pub player_score6: Option<f64>,
     #[serde(rename = "PlayerScore7")]
-    pub player_score7: f64,
+    pub player_score7: Option<f64>,
     #[serde(rename = "PlayerScore8")]
-    pub player_score8: f64,
+    pub player_score8: Option<f64>,
     #[serde(rename = "PlayerScore9")]
-    pub player_score9: f64,
+    pub player_score9: Option<f64>,
     pub all_in_pings: i64,
     pub assist_me_pings: i64,
     pub assists: i64,
@@ -93,7 +95,7 @@ pub struct Participant {
     pub command_pings: i64,
     pub consumables_purchased: i64,
     pub damage_dealt_to_buildings: i64,
-    pub damage_dealt_to_epic_monsters: i64,
+    pub damage_dealt_to_epic_monsters: Option<i64>,
     pub damage_dealt_to_objectives: i64,
     pub damage_dealt_to_turrets: i64,
     pub damage_self_mitigated: i64,
@@ -262,7 +264,6 @@ pub struct Challenges {
     pub bounty_gold: f64,
     pub buffs_stolen: f64,
     pub complete_support_quest_in_time: f64,
-    pub control_ward_time_coverage_in_river_or_enemy_half: Option<f64>,
     pub control_wards_placed: f64,
     pub damage_per_minute: f64,
     pub damage_taken_on_team_percentage: f64,
@@ -283,7 +284,6 @@ pub struct Challenges {
     pub epic_monster_steals: f64,
     pub epic_monster_stolen_without_smite: f64,
     pub first_turret_killed: f64,
-    pub first_turret_killed_time: Option<f64>,
     pub fist_bump_participation: f64,
     pub flawless_aces: f64,
     pub full_team_takedown: f64,
@@ -375,226 +375,230 @@ pub struct Challenges {
     #[serde(rename = "wardTakedownsBefore20M")]
     pub ward_takedowns_before20m: f64,
     pub wards_guarded: f64,
-    pub earliest_dragon_takedown: Option<f64>,
     pub jungler_kills_early_jungle: Option<f64>,
     pub kills_on_laners_early_jungle_as_jungler: Option<f64>,
-    pub solo_turrets_lategame: Option<f64>,
-    pub faster_support_quest_completion: Option<f64>,
-    pub highest_champion_damage: Option<f64>,
+    pub control_ward_time_coverage_in_river_or_enemy_half: Option<f64>,
     pub highest_ward_kills: Option<f64>,
-    pub baron_buff_gold_advantage_over_threshold: Option<f64>,
-    pub earliest_baron: Option<f64>,
-    pub highest_crowd_control_score: Option<f64>,
+    pub earliest_dragon_takedown: Option<f64>,
+    pub fastest_legendary: Option<f64>,
+    pub first_turret_killed_time: Option<f64>,
+    pub highest_champion_damage: Option<f64>,
+    pub solo_turrets_lategame: Option<f64>,
     pub shortest_time_to_ace_from_first_takedown: Option<f64>,
-    pub had_afk_teammate: Option<f64>,
+    pub faster_support_quest_completion: Option<f64>,
+    pub highest_crowd_control_score: Option<f64>,
+    pub earliest_baron: Option<f64>,
+    pub baron_buff_gold_advantage_over_threshold: Option<f64>,
     pub teleport_takedowns: Option<f64>,
+    pub had_afk_teammate: Option<f64>,
+    pub earliest_elder_dragon: Option<f64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Missions {
     #[serde(rename = "ActMission_S1_A2_ArenaRoundsWon")]
-    pub act_mission_s1_a2_arena_rounds_won: i64,
+    pub act_mission_s1_a2_arena_rounds_won: Option<i64>,
     #[serde(rename = "ActMission_S1_A2_BloodyPetalsCollected")]
-    pub act_mission_s1_a2_bloody_petals_collected: i64,
+    pub act_mission_s1_a2_bloody_petals_collected: Option<i64>,
     #[serde(rename = "ActMission_S1_A2_FeatsOfStrength")]
-    pub act_mission_s1_a2_feats_of_strength: i64,
+    pub act_mission_s1_a2_feats_of_strength: Option<i64>,
     #[serde(rename = "DemonsHand_MissionPointsA")]
-    pub demons_hand_mission_points_a: i64,
+    pub demons_hand_mission_points_a: Option<i64>,
     #[serde(rename = "DemonsHand_MissionPointsB")]
-    pub demons_hand_mission_points_b: i64,
+    pub demons_hand_mission_points_b: Option<i64>,
     #[serde(rename = "DemonsHand_MissionPointsC")]
-    pub demons_hand_mission_points_c: i64,
+    pub demons_hand_mission_points_c: Option<i64>,
     #[serde(rename = "DemonsHand_MissionPointsD")]
-    pub demons_hand_mission_points_d: i64,
+    pub demons_hand_mission_points_d: Option<i64>,
     #[serde(rename = "DemonsHand_MissionPointsE")]
-    pub demons_hand_mission_points_e: i64,
+    pub demons_hand_mission_points_e: Option<i64>,
     #[serde(rename = "DemonsHand_MissionPointsF")]
-    pub demons_hand_mission_points_f: i64,
+    pub demons_hand_mission_points_f: Option<i64>,
     #[serde(rename = "Event_2025LR_StructuresEpicMonsters")]
-    pub event_2025lr_structures_epic_monsters: i64,
+    pub event_2025lr_structures_epic_monsters: Option<i64>,
     #[serde(rename = "Event_ARAM_Docks")]
-    pub event_aram_docks: i64,
+    pub event_aram_docks: Option<i64>,
     #[serde(rename = "Event_ARAM_Hexgates")]
-    pub event_aram_hexgates: i64,
+    pub event_aram_hexgates: Option<i64>,
     #[serde(rename = "Event_Brawl_Jungle")]
-    pub event_brawl_jungle: i64,
+    pub event_brawl_jungle: Option<i64>,
     #[serde(rename = "Event_Brawl_Minions")]
-    pub event_brawl_minions: i64,
+    pub event_brawl_minions: Option<i64>,
     #[serde(rename = "Event_S1_A1_AprilFools_Dragon")]
-    pub event_s1_a1_april_fools_dragon: i64,
+    pub event_s1_a1_april_fools_dragon: Option<i64>,
     #[serde(rename = "Event_S1_A1_AprilFools_Snowball")]
-    pub event_s1_a1_april_fools_snowball: i64,
+    pub event_s1_a1_april_fools_snowball: Option<i64>,
     #[serde(rename = "Event_S1_A2_AprilFools_Dragon")]
-    pub event_s1_a2_april_fools_dragon: i64,
+    pub event_s1_a2_april_fools_dragon: Option<i64>,
     #[serde(rename = "Event_S1_A2_AprilFools_Garen_Play")]
-    pub event_s1_a2_april_fools_garen_play: i64,
+    pub event_s1_a2_april_fools_garen_play: Option<i64>,
     #[serde(rename = "Event_S1_A2_AprilFools_Garen_Takedown")]
-    pub event_s1_a2_april_fools_garen_takedown: i64,
+    pub event_s1_a2_april_fools_garen_takedown: Option<i64>,
     #[serde(rename = "Event_S1_A2_AprilFools_Snowball")]
-    pub event_s1_a2_april_fools_snowball: i64,
+    pub event_s1_a2_april_fools_snowball: Option<i64>,
     #[serde(rename = "Event_S1_A2_Arena_BraveryChampions")]
-    pub event_s1_a2_arena_bravery_champions: i64,
+    pub event_s1_a2_arena_bravery_champions: Option<i64>,
     #[serde(rename = "Event_S1_A2_Arena_NoxianChampions")]
-    pub event_s1_a2_arena_noxian_champions: i64,
+    pub event_s1_a2_arena_noxian_champions: Option<i64>,
     #[serde(rename = "Event_S1_A2_Arena_ReviveAllies")]
-    pub event_s1_a2_arena_revive_allies: i64,
+    pub event_s1_a2_arena_revive_allies: Option<i64>,
     #[serde(rename = "Event_S1_A2_Esports_TakedownEpicMonstersSingleGame")]
-    pub event_s1_a2_esports_takedown_epic_monsters_single_game: i64,
+    pub event_s1_a2_esports_takedown_epic_monsters_single_game: Option<i64>,
     #[serde(rename = "Event_S1_A2_Mordekaiser")]
-    pub event_s1_a2_mordekaiser: i64,
+    pub event_s1_a2_mordekaiser: Option<i64>,
     #[serde(rename = "Event_S2A2Champ_DamageAbilities")]
-    pub event_s2a2champ_damage_abilities: i64,
+    pub event_s2a2champ_damage_abilities: Option<i64>,
     #[serde(rename = "Event_S2A2Champ_DamageAutos")]
-    pub event_s2a2champ_damage_autos: i64,
+    pub event_s2a2champ_damage_autos: Option<i64>,
     #[serde(rename = "Event_S2A2_Exalted")]
-    pub event_s2a2_exalted: i64,
+    pub event_s2a2_exalted: Option<i64>,
     #[serde(rename = "Event_S2A2_MV")]
-    pub event_s2a2_mv: i64,
+    pub event_s2a2_mv: Option<i64>,
     #[serde(rename = "Event_S2A2_PetalPoints")]
-    pub event_s2a2_petal_points: i64,
+    pub event_s2a2_petal_points: Option<i64>,
     #[serde(rename = "HoL_ChampionsDamagedWhileHidden")]
-    pub ho_l_champions_damaged_while_hidden: i64,
+    pub ho_l_champions_damaged_while_hidden: Option<i64>,
     #[serde(rename = "HoL_ControlWardsKilled")]
-    pub ho_l_control_wards_killed: i64,
+    pub ho_l_control_wards_killed: Option<i64>,
     #[serde(rename = "HoL_Elite_AsheCrystalArrowTakedowns")]
-    pub ho_l_elite_ashe_crystal_arrow_takedowns: i64,
+    pub ho_l_elite_ashe_crystal_arrow_takedowns: Option<i64>,
     #[serde(rename = "HoL_Elite_AsheHawkshotChampsRevealed")]
-    pub ho_l_elite_ashe_hawkshot_champs_revealed: i64,
+    pub ho_l_elite_ashe_hawkshot_champs_revealed: Option<i64>,
     #[serde(rename = "HoL_Elite_EzrealEssenceFluxDetonated")]
-    pub ho_l_elite_ezreal_essence_flux_detonated: i64,
+    pub ho_l_elite_ezreal_essence_flux_detonated: Option<i64>,
     #[serde(rename = "HoL_Elite_EzrealTrueshotBarrageMultiHit")]
-    pub ho_l_elite_ezreal_trueshot_barrage_multi_hit: i64,
+    pub ho_l_elite_ezreal_trueshot_barrage_multi_hit: Option<i64>,
     #[serde(rename = "HoL_Elite_KaiSaAbilitiesUpgraded")]
-    pub ho_l_elite_kai_sa_abilities_upgraded: i64,
+    pub ho_l_elite_kai_sa_abilities_upgraded: Option<i64>,
     #[serde(rename = "HoL_Elite_KaiSaKillerInstinctKills")]
-    pub ho_l_elite_kai_sa_killer_instinct_kills: i64,
+    pub ho_l_elite_kai_sa_killer_instinct_kills: Option<i64>,
     #[serde(rename = "HoL_Elite_LucianCullingHits")]
-    pub ho_l_elite_lucian_culling_hits: i64,
+    pub ho_l_elite_lucian_culling_hits: Option<i64>,
     #[serde(rename = "HoL_Elite_LucianPiercingLightMultiHit")]
-    pub ho_l_elite_lucian_piercing_light_multi_hit: i64,
+    pub ho_l_elite_lucian_piercing_light_multi_hit: Option<i64>,
     #[serde(rename = "HoL_Elite_VayneCondemnStun")]
-    pub ho_l_elite_vayne_condemn_stun: i64,
+    pub ho_l_elite_vayne_condemn_stun: Option<i64>,
     #[serde(rename = "HoL_Elite_VayneTumbleDodge")]
-    pub ho_l_elite_vayne_tumble_dodge: i64,
+    pub ho_l_elite_vayne_tumble_dodge: Option<i64>,
     #[serde(rename = "HoL_EnemyTakedownUnderTower")]
-    pub ho_l_enemy_takedown_under_tower: i64,
+    pub ho_l_enemy_takedown_under_tower: Option<i64>,
     #[serde(rename = "HoL_FightsSurvivedWhileLowHealth")]
-    pub ho_l_fights_survived_while_low_health: i64,
+    pub ho_l_fights_survived_while_low_health: Option<i64>,
     #[serde(rename = "HoL_HiddenEnemiesDamaged")]
-    pub ho_l_hidden_enemies_damaged: i64,
+    pub ho_l_hidden_enemies_damaged: Option<i64>,
     #[serde(rename = "HoL_JungleCampsStolen")]
-    pub ho_l_jungle_camps_stolen: i64,
+    pub ho_l_jungle_camps_stolen: Option<i64>,
     #[serde(rename = "HoL_KillsWhileLowHealth")]
-    pub ho_l_kills_while_low_health: i64,
+    pub ho_l_kills_while_low_health: Option<i64>,
     #[serde(rename = "HoL_OutnumberedTakedowns")]
-    pub ho_l_outnumbered_takedowns: i64,
+    pub ho_l_outnumbered_takedowns: Option<i64>,
     #[serde(rename = "HoL_ShutdownGoldCollected")]
-    pub ho_l_shutdown_gold_collected: i64,
+    pub ho_l_shutdown_gold_collected: Option<i64>,
     #[serde(rename = "HoL_SoloKills")]
-    pub ho_l_solo_kills: i64,
+    pub ho_l_solo_kills: Option<i64>,
     #[serde(rename = "HoL_TurretsTakenWithinMinutes")]
-    pub ho_l_turrets_taken_within_minutes: i64,
+    pub ho_l_turrets_taken_within_minutes: Option<i64>,
     #[serde(rename = "Missions_BXP_EarnedPerGame")]
-    pub missions_bxp_earned_per_game: i64,
+    pub missions_bxp_earned_per_game: Option<i64>,
     #[serde(rename = "Missions_CannonMinionsKilled")]
-    pub missions_cannon_minions_killed: i64,
+    pub missions_cannon_minions_killed: Option<i64>,
     #[serde(rename = "Missions_ChampionTakedownsWhileGhosted")]
-    pub missions_champion_takedowns_while_ghosted: i64,
+    pub missions_champion_takedowns_while_ghosted: Option<i64>,
     #[serde(rename = "Missions_ChampionTakedownsWithIgnite")]
-    pub missions_champion_takedowns_with_ignite: i64,
+    pub missions_champion_takedowns_with_ignite: Option<i64>,
     #[serde(rename = "Missions_ChampionsHitWithAbilitiesEarlyGame")]
-    pub missions_champions_hit_with_abilities_early_game: i64,
+    pub missions_champions_hit_with_abilities_early_game: Option<i64>,
     #[serde(rename = "Missions_ChampionsKilled")]
-    pub missions_champions_killed: i64,
+    pub missions_champions_killed: Option<i64>,
     #[serde(rename = "Missions_CreepScore")]
-    pub missions_creep_score: i64,
+    pub missions_creep_score: Option<i64>,
     #[serde(rename = "Missions_CreepScoreBy10Minutes")]
-    pub missions_creep_score_by10minutes: i64,
+    pub missions_creep_score_by10minutes: Option<i64>,
     #[serde(rename = "Missions_Crepe_DamageDealtSpeedZone")]
-    pub missions_crepe_damage_dealt_speed_zone: i64,
+    pub missions_crepe_damage_dealt_speed_zone: Option<i64>,
     #[serde(rename = "Missions_Crepe_SnowballLanded")]
-    pub missions_crepe_snowball_landed: i64,
+    pub missions_crepe_snowball_landed: Option<i64>,
     #[serde(rename = "Missions_Crepe_TakedownsWithInhibBuff")]
-    pub missions_crepe_takedowns_with_inhib_buff: i64,
+    pub missions_crepe_takedowns_with_inhib_buff: Option<i64>,
     #[serde(rename = "Missions_DamageToChampsWithItems")]
-    pub missions_damage_to_champs_with_items: i64,
+    pub missions_damage_to_champs_with_items: Option<i64>,
     #[serde(rename = "Missions_DamageToStructures")]
-    pub missions_damage_to_structures: i64,
+    pub missions_damage_to_structures: Option<i64>,
     #[serde(rename = "Missions_DestroyPlants")]
-    pub missions_destroy_plants: i64,
+    pub missions_destroy_plants: Option<i64>,
     #[serde(rename = "Missions_DominationRune")]
-    pub missions_domination_rune: i64,
+    pub missions_domination_rune: Option<i64>,
     #[serde(rename = "Missions_GoldFromStructuresDestroyed")]
-    pub missions_gold_from_structures_destroyed: i64,
+    pub missions_gold_from_structures_destroyed: Option<i64>,
     #[serde(rename = "Missions_GoldFromTurretPlatesTaken")]
-    pub missions_gold_from_turret_plates_taken: i64,
+    pub missions_gold_from_turret_plates_taken: Option<i64>,
     #[serde(rename = "Missions_GoldPerMinute")]
-    pub missions_gold_per_minute: i64,
+    pub missions_gold_per_minute: Option<i64>,
     #[serde(rename = "Missions_HealingFromLevelObjects")]
-    pub missions_healing_from_level_objects: i64,
+    pub missions_healing_from_level_objects: Option<i64>,
     #[serde(rename = "Missions_HexgatesUsed")]
-    pub missions_hexgates_used: i64,
+    pub missions_hexgates_used: Option<i64>,
     #[serde(rename = "Missions_ImmobilizeChampions")]
-    pub missions_immobilize_champions: i64,
+    pub missions_immobilize_champions: Option<i64>,
     #[serde(rename = "Missions_InspirationRune")]
-    pub missions_inspiration_rune: i64,
+    pub missions_inspiration_rune: Option<i64>,
     #[serde(rename = "Missions_LegendaryItems")]
-    pub missions_legendary_items: i64,
+    pub missions_legendary_items: Option<i64>,
     #[serde(rename = "Missions_MinionsKilled")]
-    pub missions_minions_killed: i64,
+    pub missions_minions_killed: Option<i64>,
     #[serde(rename = "Missions_PeriodicDamage")]
-    pub missions_periodic_damage: i64,
+    pub missions_periodic_damage: Option<i64>,
     #[serde(rename = "Missions_PlaceUsefulControlWards")]
-    pub missions_place_useful_control_wards: i64,
+    pub missions_place_useful_control_wards: Option<i64>,
     #[serde(rename = "Missions_PlaceUsefulWards")]
-    pub missions_place_useful_wards: i64,
+    pub missions_place_useful_wards: Option<i64>,
     #[serde(rename = "Missions_PorosFed")]
-    pub missions_poros_fed: i64,
+    pub missions_poros_fed: Option<i64>,
     #[serde(rename = "Missions_PrecisionRune")]
-    pub missions_precision_rune: i64,
+    pub missions_precision_rune: Option<i64>,
     #[serde(rename = "Missions_ResolveRune")]
-    pub missions_resolve_rune: i64,
+    pub missions_resolve_rune: Option<i64>,
     #[serde(rename = "Missions_SnowballsHit")]
-    pub missions_snowballs_hit: i64,
+    pub missions_snowballs_hit: Option<i64>,
     #[serde(rename = "Missions_SorceryRune")]
-    pub missions_sorcery_rune: i64,
+    pub missions_sorcery_rune: Option<i64>,
     #[serde(rename = "Missions_TakedownBaronsElderDragons")]
-    pub missions_takedown_barons_elder_dragons: i64,
+    pub missions_takedown_barons_elder_dragons: Option<i64>,
     #[serde(rename = "Missions_TakedownDragons")]
-    pub missions_takedown_dragons: i64,
+    pub missions_takedown_dragons: Option<i64>,
     #[serde(rename = "Missions_TakedownEpicMonsters")]
-    pub missions_takedown_epic_monsters: i64,
+    pub missions_takedown_epic_monsters: Option<i64>,
     #[serde(rename = "Missions_TakedownEpicMonstersSingleGame")]
-    pub missions_takedown_epic_monsters_single_game: i64,
+    pub missions_takedown_epic_monsters_single_game: Option<i64>,
     #[serde(rename = "Missions_TakedownGold")]
-    pub missions_takedown_gold: i64,
+    pub missions_takedown_gold: Option<i64>,
     #[serde(rename = "Missions_TakedownStructures")]
-    pub missions_takedown_structures: i64,
+    pub missions_takedown_structures: Option<i64>,
     #[serde(rename = "Missions_TakedownWards")]
-    pub missions_takedown_wards: i64,
+    pub missions_takedown_wards: Option<i64>,
     #[serde(rename = "Missions_TakedownsAfterExhausting")]
-    pub missions_takedowns_after_exhausting: i64,
+    pub missions_takedowns_after_exhausting: Option<i64>,
     #[serde(rename = "Missions_TakedownsAfterTeleporting")]
-    pub missions_takedowns_after_teleporting: i64,
+    pub missions_takedowns_after_teleporting: Option<i64>,
     #[serde(rename = "Missions_TakedownsBefore15Min")]
-    pub missions_takedowns_before15min: i64,
+    pub missions_takedowns_before15min: Option<i64>,
     #[serde(rename = "Missions_TakedownsUnderTurret")]
-    pub missions_takedowns_under_turret: i64,
+    pub missions_takedowns_under_turret: Option<i64>,
     #[serde(rename = "Missions_TakedownsWithHelpFromMonsters")]
-    pub missions_takedowns_with_help_from_monsters: i64,
+    pub missions_takedowns_with_help_from_monsters: Option<i64>,
     #[serde(rename = "Missions_TimeSpentActivelyPlaying")]
-    pub missions_time_spent_actively_playing: i64,
+    pub missions_time_spent_actively_playing: Option<i64>,
     #[serde(rename = "Missions_TotalGold")]
-    pub missions_total_gold: i64,
+    pub missions_total_gold: Option<i64>,
     #[serde(rename = "Missions_TrueDamageToStructures")]
-    pub missions_true_damage_to_structures: i64,
+    pub missions_true_damage_to_structures: Option<i64>,
     #[serde(rename = "Missions_TurretPlatesDestroyed")]
-    pub missions_turret_plates_destroyed: i64,
+    pub missions_turret_plates_destroyed: Option<i64>,
     #[serde(rename = "Missions_TwoChampsKilledWithSameAbility")]
-    pub missions_two_champs_killed_with_same_ability: i64,
+    pub missions_two_champs_killed_with_same_ability: Option<i64>,
     #[serde(rename = "Missions_VoidMitesSummoned")]
-    pub missions_void_mites_summoned: i64,
+    pub missions_void_mites_summoned: Option<i64>,
     #[serde(rename = "PlayerScore0")]
     pub player_score0: f64,
     #[serde(rename = "PlayerScore1")]
@@ -620,21 +624,23 @@ pub struct Missions {
     #[serde(rename = "PlayerScore9")]
     pub player_score9: f64,
     #[serde(rename = "S3A1_Event_DoombotsTakenDownBefore5")]
-    pub s3a1_event_doombots_taken_down_before5: i64,
+    pub s3a1_event_doombots_taken_down_before5: Option<i64>,
     #[serde(rename = "S3A1_PlayAsDemaciansOrAgainstNoxians")]
-    pub s3a1_play_as_demacians_or_against_noxians: i64,
+    pub s3a1_play_as_demacians_or_against_noxians: Option<i64>,
     #[serde(rename = "S3A1_Takedowns")]
-    pub s3a1_takedowns: i64,
+    pub s3a1_takedowns: Option<i64>,
     #[serde(rename = "S3A2_PrismaticAug")]
-    pub s3a2_prismatic_aug: i64,
+    pub s3a2_prismatic_aug: Option<i64>,
     #[serde(rename = "SeasonalMissions_TakedownAtakhan")]
-    pub seasonal_missions_takedown_atakhan: i64,
+    pub seasonal_missions_takedown_atakhan: Option<i64>,
     #[serde(rename = "WeeklyMission_S2_DamagingAbilities")]
-    pub weekly_mission_s2_damaging_abilities: i64,
+    pub weekly_mission_s2_damaging_abilities: Option<i64>,
     #[serde(rename = "WeeklyMission_S2_FeatsOfStrength")]
-    pub weekly_mission_s2_feats_of_strength: i64,
+    pub weekly_mission_s2_feats_of_strength: Option<i64>,
     #[serde(rename = "WeeklyMission_S2_SpiritPetals")]
-    pub weekly_mission_s2_spirit_petals: i64,
+    pub weekly_mission_s2_spirit_petals: Option<i64>,
+    #[serde(rename = "S3A2_ZaahenUnlock")]
+    pub s3a2_zaahen_unlock: Option<i64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -673,7 +679,7 @@ pub struct Selection {
 #[serde(rename_all = "camelCase")]
 pub struct Team {
     pub bans: Vec<Ban>,
-    pub feats: Feats,
+    pub feats: Option<Feats>,
     pub objectives: Objectives,
     pub team_id: i64,
     pub win: bool,
@@ -706,7 +712,7 @@ pub struct EpicMonsterKill {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Objectives {
-    pub atakhan: Atakhan,
+    pub atakhan: Option<Atakhan>,
     pub baron: Atakhan,
     pub champion: Atakhan,
     pub dragon: Atakhan,

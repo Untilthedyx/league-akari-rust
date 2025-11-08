@@ -42,9 +42,7 @@ impl GameDataHttpApi {
     /// - 返回: 物品数组（Vec<Item>）或 HTTP 错误
     #[instrument(skip_all)]
     pub async fn get_items(&self) -> Result<Vec<Item>, HttpError> {
-        self.client
-            .get("/lol-game-data/assets/v1/items.json")
-            .await
+        self.client.get("/lol-game-data/assets/v1/items.json").await
     }
 
     /// 获取英雄简要信息列表
@@ -60,18 +58,14 @@ impl GameDataHttpApi {
     /// - 返回: 地图信息数组（Vec<GameMap>）或 HTTP 错误
     #[instrument(skip_all)]
     pub async fn get_maps(&self) -> Result<Vec<GameMap>, HttpError> {
-        self.client
-            .get("/lol-game-data/assets/v1/maps.json")
-            .await
+        self.client.get("/lol-game-data/assets/v1/maps.json").await
     }
 
     /// 获取所有符文详情
     /// - 返回: 符文数组（Vec<Perk>）或 HTTP 错误
     #[instrument(skip_all)]
     pub async fn get_perks(&self) -> Result<Vec<Perk>, HttpError> {
-        self.client
-            .get("/lol-game-data/assets/v1/perks.json")
-            .await
+        self.client.get("/lol-game-data/assets/v1/perks.json").await
     }
 
     /// 获取所有队列信息

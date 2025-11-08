@@ -1,30 +1,22 @@
 use tauri_app_demo_lib::shared::http_api::sgp::SgpApi;
-use tauri_app_demo_lib::shared::init::http::{get_http_client, init_http_client};
+use tauri_app_demo_lib::shared::init::lcu::{get_lcu_client, init_lcu_client};
 use tauri_app_demo_lib::shared::init::process::{get_process_info, init_process_info};
-use tauri_app_demo_lib::utils::log::{config::LogConfig, init_logger};
+use tauri_app_demo_lib::utils::log::init_logger;
 use tokio::runtime::Builder;
 
 #[test]
 fn test_sgp_api() {
     async fn spg_api() {
-        let config = LogConfig {
-            level: "trace".to_string(),
-            output: "console".to_string(),
-            file_path: None,
-        };
-
-        if let Err(e) = init_logger(&config) {
-            panic!("init logger error: {}", e.to_string());
-        }
+        init_logger();
 
         init_process_info().await.unwrap();
 
         let a = get_process_info().await.unwrap();
         println!("{:?}", a);
 
-        init_http_client().await.unwrap();
+        init_lcu_client().await.unwrap();
         println!("init http client success");
-        let client = get_http_client().await.unwrap();
+        let client = get_lcu_client().await.unwrap();
         let ranked = client.entitlements.get_entitlements_token().await.unwrap();
         let access_token = ranked.access_token;
         println!("{:?}", access_token);

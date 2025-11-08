@@ -44,9 +44,9 @@ pub struct Lobby {
     pub multi_user_chat_password: String,
     pub party_id: String,
     pub party_type: String,
-    pub restrictions: Vec<serde_json::Value>, // any[]
+    pub restrictions: Vec<serde_json::Value>,     // any[]
     pub scarce_positions: Vec<serde_json::Value>, // any[]
-    pub warnings: Vec<serde_json::Value>, // any[]
+    pub warnings: Vec<serde_json::Value>,         // any[]
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]

@@ -1,6 +1,4 @@
-use crate::{
-    shared::http_api::lcu::http::HttpClient, utils::error::http_error::HttpError,
-};
+use crate::{shared::http_api::lcu::http::HttpClient, utils::error::http_error::HttpError};
 
 #[derive(Clone)]
 pub struct ChallengesHttpApi {

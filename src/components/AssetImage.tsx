@@ -53,7 +53,7 @@ export interface AssetImageProps {
  * @param type 图片类型
  * @returns Promise<string> 图片 URL
  */
-async function getImageUrl(id: string, type: ImageType): Promise<string> {
+async function getImageData(id: string, type: ImageType): Promise<string> {
   const cacheKey: CacheKey = `${type}:${id}`;
 
   // 1. 检查缓存
@@ -133,26 +133,37 @@ export default function AssetImage({
   alt = "",
   ...props
 }: AssetImageProps) {
+  if (id === "0") {
+    return (
+      <div
+        className={cn("bg-muted/30 border-none", className)}
+        style={{ border: "none", outline: "none" }}
+        aria-label={alt || "空"}
+        {...props}
+      />
+    );
+  }
+
   // 生成缓存键
   const cacheKey: CacheKey = useMemo(() => {
     return `${type}:${id}` as CacheKey;
   }, [type, id]);
 
   // 检查缓存中是否已有该图片
-  const cachedUrl = useMemo(() => {
+  const cachedData = useMemo(() => {
     return imageCache.get(cacheKey) || null;
   }, [cacheKey]);
 
   // 图片 URL 状态
-  const [imageUrl, setImageUrl] = useState<string | null>(cachedUrl);
-  const [isLoading, setIsLoading] = useState(!cachedUrl);
+  const [imageData, setImageData] = useState<string | null>(cachedData);
+  const [isLoading, setIsLoading] = useState(!cachedData);
   const [hasError, setHasError] = useState(false);
 
   // 加载图片
   useEffect(() => {
     // 如果缓存中已有，直接使用
-    if (cachedUrl) {
-      setImageUrl(cachedUrl);
+    if (cachedData) {
+      setImageData(cachedData);
       setIsLoading(false);
       return;
     }
@@ -162,10 +173,10 @@ export default function AssetImage({
     setIsLoading(true);
     setHasError(false);
 
-    getImageUrl(id, type)
+    getImageData(id, type)
       .then((url) => {
         if (!cancelled) {
-          setImageUrl(url);
+          setImageData(url);
           setIsLoading(false);
         }
       })
@@ -180,10 +191,10 @@ export default function AssetImage({
     return () => {
       cancelled = true;
     };
-  }, [id, type, cacheKey, cachedUrl]);
+  }, [id, type, cacheKey, cachedData]);
 
   // 如果图片加载中或加载失败，显示空的占位元素（保持大小）
-  if (isLoading || hasError || !imageUrl) {
+  if (isLoading || hasError || !imageData) {
     return (
       <div
         className={cn("bg-muted/30 border-none", className)}
@@ -196,14 +207,14 @@ export default function AssetImage({
 
   return (
     <img
-      src={imageUrl}
+      src={imageData}
       alt={alt || `${type} ${id}`}
       className={cn("border-none", className)}
       style={{ border: "none", outline: "none" }}
       onError={() => {
         // 加载失败时标记错误，显示占位元素
         setHasError(true);
-        setImageUrl(null);
+        setImageData(null);
       }}
       {...props}
     />

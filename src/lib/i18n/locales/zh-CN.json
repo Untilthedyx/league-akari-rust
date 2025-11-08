@@ -40,12 +40,11 @@
     "other": "其他"
   },
   "filter": {
-    "queue": "游戏模式筛选",
-    "win": "胜负筛选",
-    "mvp": "最佳筛选",
-    "hero": "英雄筛选",
-    "allModes": "全部模式",
-    "allHeroes": "全部英雄"
+    "all": "全部",
+    "gameMode": "游戏模式筛选",
+    "result": "胜负筛选",
+    "bestPlayer": "最佳筛选",
+    "hero": "英雄筛选"
   }
 }
 

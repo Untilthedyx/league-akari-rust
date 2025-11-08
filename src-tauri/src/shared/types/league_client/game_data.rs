@@ -10,7 +10,7 @@ use std::collections::HashMap;
 #[serde(rename_all = "camelCase")]
 pub struct SummonerSpell {
     /// 技能ID
-    pub id: u32,
+    pub id: i64,
     /// 技能名称
     pub name: String,
     /// 技能描述
@@ -127,7 +127,7 @@ pub struct AssetMap {
 #[serde(rename_all = "camelCase")]
 pub struct Item {
     /// 物品ID
-    pub id: u32,
+    pub id: i64,
     /// 物品名称
     pub name: String,
     /// 物品描述
@@ -185,18 +185,15 @@ pub struct Item {
 // ------------------------------
 
 /// 英雄简要信息
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionSimple {
-    /// 英雄ID
-    pub id: u32,
-    /// 英雄名称
+    pub id: i64,
     pub name: String,
-    /// 英雄别名
+    pub description: String,
     pub alias: String,
-    /// 方形头像路径
+    pub content_id: String,
     pub square_portrait_path: String,
-    /// 英雄定位
     pub roles: Vec<String>,
 }
 
@@ -310,7 +307,7 @@ pub struct GameMapAssetDetails {
 #[serde(rename_all = "camelCase")]
 pub struct Perk {
     /// 符文ID
-    pub id: u32,
+    pub id: i64,
     /// 符文名称
     pub name: String,
     /// 重大变更的版本

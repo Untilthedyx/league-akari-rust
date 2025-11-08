@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use serde_json::Value;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -82,7 +82,6 @@ pub struct Team {
     pub vilemaw_kills: i32,
     pub win: String, // 可根据需要改为枚举："Win" | "Fail"
 }
-
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -331,8 +330,7 @@ pub fn is_pve_queue(queue_id: i32) -> bool {
         // 大提莫节，应该是新版的末日人机
         90, 91, 92, 950, 951, 960, 961,
         // 怪兽入侵模式，没打过不知道是不是
-        981, 982, 990,
-        // 奥德赛系列
+        981, 982, 990, // 奥德赛系列
         1030, 1031, 1032, 1040, 1041, 1050, 1051, 1060, 1061, 1070, 1071,
         // STRAWBERRY 模式
         1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890,

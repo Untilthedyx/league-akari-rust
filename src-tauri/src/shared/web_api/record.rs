@@ -1,4 +1,4 @@
-use crate::shared::init::http::get_http_client;
+use crate::shared::init::lcu::get_lcu_client;
 use crate::shared::types::league_client::match_history::Game;
 use crate::shared::{
     http_api::lcu::LcuApi,
@@ -238,7 +238,8 @@ pub async fn parse_game(client: &LcuApi, game: &Game, puuid: &str) -> RecordItem
     }
 
     if team_total_damage_taken > 0.0 {
-        record.stats.damage_taken_share = record.stats.damage_taken as f64 / team_total_damage_taken;
+        record.stats.damage_taken_share =
+            record.stats.damage_taken as f64 / team_total_damage_taken;
     } else {
         record.stats.damage_taken_share = 0.0;
     }
@@ -257,7 +258,7 @@ pub async fn get_record_list(
     beg_index: Option<i32>,
     end_index: Option<i32>,
 ) -> Result<Vec<RecordItem>, String> {
-    let client = match get_http_client().await {
+    let client = match get_lcu_client().await {
         Ok(client) => client,
         Err(e) => return Err(e.to_string()),
     };
@@ -267,14 +268,14 @@ pub async fn get_record_list(
         .get_match_history(puuid, beg_index, end_index)
         .await
         .expect("获取比赛历史失败");
-    
+
     let futures: Vec<_> = match_history
         .games
         .games
         .iter()
         .map(|game| parse_game(&client, game, puuid))
         .collect();
-    
+
     let record_list = join_all(futures).await;
 
     Ok(record_list)

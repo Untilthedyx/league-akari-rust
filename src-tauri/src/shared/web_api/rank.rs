@@ -1,11 +1,11 @@
-use crate::shared::init::http::get_http_client;
+use crate::shared::init::lcu::get_lcu_client;
 use std::collections::HashMap;
 
 /// must make sure the client is initialized
 pub async fn get_rank_info() -> Result<HashMap<String, String>, String> {
     let mut info_map = HashMap::new();
 
-    let client = match get_http_client().await {
+    let client = match get_lcu_client().await {
         Ok(client) => client,
         Err(e) => return Err(e.to_string()),
     };

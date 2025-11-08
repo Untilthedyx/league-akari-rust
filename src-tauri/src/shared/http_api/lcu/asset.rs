@@ -1,6 +1,6 @@
 use crate::shared::http_api::lcu::http::HttpClient;
 use crate::shared::init::game_data::{
-    get_item_icons_cache, get_perk_icons_cache, get_spell_icons_cache,
+    get_champion_info_cache, get_item_info_cache, get_perk_info_cache, get_spell_info_cache,
 };
 use crate::utils::error::http_error::HttpError;
 use base64::engine::general_purpose::STANDARD;
@@ -40,11 +40,12 @@ impl AssetHttpApi {
     /// # 返回
     /// - Base64 编码的图片数据 URL
     pub async fn get_champion_icon_base64(&self, champion_id: u32) -> Result<String, HttpError> {
-        let uri = format!(
-            "/lol-game-data/assets/v1/champion-icons/{}.png",
-            champion_id
-        );
-        self.get_image_as_base64(&uri).await
+        let cache = get_champion_info_cache().await;
+        let item = cache
+            .get(&champion_id.to_string())
+            .ok_or_else(|| HttpError::NotFound(format!("未找到英雄图标: {}", champion_id)))?;
+
+        self.get_image_as_base64(&item.icon_path.as_str()).await
     }
 
     /// 获取物品图标（Base64 编码）
@@ -60,17 +61,15 @@ impl AssetHttpApi {
     /// - 按需将 URL 转换为 base64，只在需要时才加载图片数据
     pub async fn get_item_icon_base64(&self, item_id: u32) -> Result<String, HttpError> {
         // 获取或初始化 URL 缓存
-        let cache = get_item_icons_cache()
-            .await
-            .map_err(|e| HttpError::NotFound(e.to_string()))?;
+        let cache = get_item_info_cache().await;
 
         // 从缓存获取图标路径
-        let icon_path = cache
+        let item = cache
             .get(&item_id.to_string())
             .ok_or_else(|| HttpError::NotFound(format!("未找到物品图标: {}", item_id)))?;
 
         // 按需转换为 base64
-        self.get_image_as_base64(icon_path).await
+        self.get_image_as_base64(&item.icon_path.as_str()).await
     }
 
     /// 获取召唤师技能图标（Base64 编码）
@@ -86,17 +85,15 @@ impl AssetHttpApi {
     /// - 按需将 URL 转换为 base64，只在需要时才加载图片数据
     pub async fn get_spell_icon_base64(&self, spell_id: &str) -> Result<String, HttpError> {
         // 获取或初始化 URL 缓存
-        let cache = get_spell_icons_cache()
-            .await
-            .map_err(|e| HttpError::NotFound(e.to_string()))?;
+        let cache = get_spell_info_cache().await;
 
         // 从缓存获取图标路径
-        let icon_path = cache
+        let spell = cache
             .get(spell_id)
             .ok_or_else(|| HttpError::NotFound(format!("未找到召唤师技能图标: {}", spell_id)))?;
 
         // 按需转换为 base64
-        self.get_image_as_base64(icon_path).await
+        self.get_image_as_base64(&spell.icon_path.as_str()).await
     }
 
     /// 获取符文图标（Base64 编码）
@@ -112,17 +109,15 @@ impl AssetHttpApi {
     /// - 按需将 URL 转换为 base64，只在需要时才加载图片数据
     pub async fn get_perk_icon_base64(&self, perk_id: &str) -> Result<String, HttpError> {
         // 获取或初始化 URL 缓存
-        let cache = get_perk_icons_cache()
-            .await
-            .map_err(|e| HttpError::NotFound(e.to_string()))?;
+        let cache = get_perk_info_cache().await;
 
         // 从缓存获取图标路径
-        let icon_path = cache
+        let item = cache
             .get(perk_id)
             .ok_or_else(|| HttpError::NotFound(format!("未找到符文图标: {}", perk_id)))?;
 
         // 按需转换为 base64
-        self.get_image_as_base64(icon_path).await
+        self.get_image_as_base64(&item.icon_path.as_str()).await
     }
 
     /// 获取图片并转换为 Base64 编码
@@ -148,5 +143,4 @@ impl AssetHttpApi {
         // 返回 Data URL 格式
         Ok(format!("data:{};base64,{}", content_type, base64_str))
     }
-
 }
