@@ -1,8 +1,8 @@
 use crate::shared::init::game_data::{
-    clear_champion_info_cache, clear_item_info_cache, clear_perk_info_cache, clear_spell_info_cache,
+    clear_champion_info_cache, clear_item_info_cache, clear_perk_info_cache, clear_spell_info_cache, clear_perk_style_info_cache
 };
 use crate::shared::init::game_data::{
-    init_champion_info_cache, init_item_info_cache, init_perk_info_cache, init_spell_info_cache,
+    init_champion_info_cache, init_item_info_cache, init_perk_info_cache, init_spell_info_cache, init_perk_style_info_cache
 };
 
 use crate::shared::init::lcu::get_lcu_client;
@@ -120,6 +120,10 @@ pub async fn init_state(app_handle: Option<AppHandle>) {
     emit_init_status(&app_handle, false, "正在初始化英雄图标缓存...", None);
     retry_with_delay(|| init_champion_info_cache(), "英雄图标缓存").await;
 
+    info!("正在初始化符文风格图标缓存...");
+    emit_init_status(&app_handle, false, "正在初始化符文风格图标缓存...", None);
+    retry_with_delay(|| init_perk_style_info_cache(), "符文风格图标缓存").await;
+
     info!("正在初始化物品图标缓存...");
     emit_init_status(&app_handle, false, "正在初始化物品图标缓存...", None);
     retry_with_delay(|| init_item_info_cache(), "物品图标缓存").await;
@@ -145,6 +149,8 @@ pub async fn clear_state(app_handle: Option<AppHandle>) {
     clear_spell_info_cache().await;
     info!("正在清除符文图标缓存...");
     clear_perk_info_cache().await;
+    info!("正在清除符文风格图标缓存...");
+    clear_perk_style_info_cache().await;
     info!("正在清除英雄图标缓存...");
     clear_champion_info_cache().await;
 

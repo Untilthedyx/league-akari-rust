@@ -1,6 +1,7 @@
 use crate::shared::init::game_data::get_champion_info_cache;
 use crate::shared::init::game_data::get_item_info_cache;
 use crate::shared::init::game_data::get_perk_info_cache;
+use crate::shared::init::game_data::get_perk_style_info_cache;
 use crate::shared::init::game_data::get_spell_info_cache;
 use crate::shared::init::sgp::get_sgp_client;
 use crate::shared::types::sgp::history::{Games, Participant as SgpParticipant};
@@ -181,6 +182,7 @@ pub async fn parse_participant(sgp_participant: &SgpParticipant) -> Participant 
     let item_info = get_item_info_cache().await;
     let spell_info = get_spell_info_cache().await;
     let perk_info = get_perk_info_cache().await;
+    let perk_style_info = get_perk_style_info_cache().await;
 
     // 辅助函数：安全获取物品名称，如果不存在则返回默认值
     let get_item_name = |item_id: i64| -> String {
@@ -217,6 +219,14 @@ pub async fn parse_participant(sgp_participant: &SgpParticipant) -> Participant 
             .unwrap_or_else(|| format!("未知符文({})", perk_id))
     };
 
+    // 辅助函数：安全获取符文风格名称
+    let get_perk_style_name = |style_id: i64| -> String {
+        perk_style_info
+            .get(&style_id)
+            .map(|style| style.name.clone())
+            .unwrap_or_else(|| format!("未知符文风格({})", style_id))
+    };
+
     let mut participant = Participant::default();
     participant.puuid = sgp_participant.puuid.clone();
     participant.name = sgp_participant.riot_id_game_name.clone();
@@ -247,7 +257,7 @@ pub async fn parse_participant(sgp_participant: &SgpParticipant) -> Participant 
         },
         Item {
             id: sgp_participant.perks.styles[1].selections[0].perk,
-            name: get_perk_name(sgp_participant.perks.styles[1].selections[0].perk),
+            name: get_perk_style_name(sgp_participant.perks.styles[1].selections[0].perk),
         },
     ];
 

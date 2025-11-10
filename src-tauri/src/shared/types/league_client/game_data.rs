@@ -44,7 +44,7 @@ pub struct Perkstyles {
 #[serde(rename_all = "camelCase")]
 pub struct Style {
     /// 风格ID
-    pub id: u32,
+    pub id: i64,
     /// 风格名称
     pub name: String,
     /// 提示文本

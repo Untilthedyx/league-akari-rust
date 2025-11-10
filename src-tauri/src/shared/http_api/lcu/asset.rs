@@ -1,6 +1,6 @@
 use crate::shared::http_api::lcu::http::HttpClient;
 use crate::shared::init::game_data::{
-    get_champion_info_cache, get_item_info_cache, get_perk_info_cache, get_spell_info_cache,
+    get_champion_info_cache, get_item_info_cache, get_perk_info_cache, get_spell_info_cache, get_perk_style_info_cache
 };
 use crate::utils::error::http_error::HttpError;
 use base64::engine::general_purpose::STANDARD;
@@ -115,6 +115,30 @@ impl AssetHttpApi {
         let item = cache
             .get(&perk_id)
             .ok_or_else(|| HttpError::NotFound(format!("未找到符文图标: {}", perk_id)))?;
+
+        // 按需转换为 base64
+        self.get_image_as_base64(&item.icon_path.as_str()).await
+    }
+
+    /// 获取符文风格图标（Base64 编码）
+    ///
+    /// # 参数
+    /// - `perk_style_id`: 符文风格 ID（字符串格式）
+    ///
+    /// # 返回
+    /// - Base64 编码的图片数据 URL
+    ///
+    /// # 性能优化
+    /// - 使用全局缓存存储图标 URL 路径（避免一次性加载所有图片）
+    /// - 按需将 URL 转换为 base64，只在需要时才加载图片数据
+    pub async fn get_perk_style_icon_base64(&self, perk_style_id: i64) -> Result<String, HttpError> {
+        // 获取或初始化 URL 缓存
+        let cache = get_perk_style_info_cache().await;
+
+        // 从缓存获取图标路径
+        let item = cache
+            .get(&perk_style_id)
+            .ok_or_else(|| HttpError::NotFound(format!("未找到符文风格图标: {}", perk_style_id)))?;
 
         // 按需转换为 base64
         self.get_image_as_base64(&item.icon_path.as_str()).await

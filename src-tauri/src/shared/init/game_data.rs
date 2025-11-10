@@ -16,6 +16,8 @@ static CHAMPION_ICONS_CACHE: RwLock<Option<Arc<HashMap<i64, Item>>>> = RwLock::c
 static ITEM_ICONS_CACHE: RwLock<Option<Arc<HashMap<i64, Item>>>> = RwLock::const_new(None);
 static SPELL_ICONS_CACHE: RwLock<Option<Arc<HashMap<i64, Item>>>> = RwLock::const_new(None);
 static PERK_ICONS_CACHE: RwLock<Option<Arc<HashMap<i64, Item>>>> = RwLock::const_new(None);
+static PERKSTYLE_ICONS_CACHE: RwLock<Option<Arc<HashMap<i64, Item>>>> = RwLock::const_new(None);
+
 
 /// 检查缓存是否已初始化
 pub async fn is_cache_initialized() -> bool {
@@ -24,6 +26,44 @@ pub async fn is_cache_initialized() -> bool {
     let spell_ok = SPELL_ICONS_CACHE.read().await.is_some();
     let perk_ok = PERK_ICONS_CACHE.read().await.is_some();
     champion_ok && item_ok && spell_ok && perk_ok
+}
+
+pub async fn init_perk_style_info_cache() -> Result<(), InitError> {
+    let client = get_lcu_client()
+        .await
+        .map_err(|e: InitError| InitError::Init(e.to_string()))?;
+    let perk_style = client
+        .game_data
+        .get_perkstyles()
+        .await
+        .map_err(|e| InitError::Init(e.to_string()))?;
+    let mut perk_style_map = HashMap::new();
+    for perk in perk_style.styles {
+        perk_style_map.insert(
+            perk.id,
+            Item {
+                id: perk.id,
+                name: perk.name,
+                icon_path: perk.icon_path,
+            },
+        );
+    }
+    let mut guard = PERKSTYLE_ICONS_CACHE.write().await;
+    *guard = Some(Arc::new(perk_style_map));
+    Ok(())
+}
+
+pub async fn get_perk_style_info_cache() -> Arc<HashMap<i64, Item>> {
+    let guard = PERKSTYLE_ICONS_CACHE.read().await;
+    guard
+        .as_ref()
+        .map(|arc| Arc::clone(arc))
+        .unwrap_or_else(|| panic!("符文风格图标缓存未初始化"))
+}
+
+pub async fn clear_perk_style_info_cache() {
+    let mut guard = PERKSTYLE_ICONS_CACHE.write().await;
+    *guard = None;
 }
 
 pub async fn init_champion_info_cache() -> Result<(), InitError> {
