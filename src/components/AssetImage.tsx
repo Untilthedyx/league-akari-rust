@@ -133,34 +133,32 @@ export default function AssetImage({
   alt = "",
   ...props
 }: AssetImageProps) {
-  if (id === 0) {
-    return (
-      <div
-        className={cn("bg-muted/30 border-none", className)}
-        style={{ border: "none", outline: "none" }}
-        aria-label={alt || "空"}
-        {...props}
-      />
-    );
-  }
-
-  // 生成缓存键
+  // 生成缓存键（即使 id === 0 也要调用，保持 Hooks 调用顺序一致）
   const cacheKey: CacheKey = useMemo(() => {
     return `${type}:${id}` as CacheKey;
   }, [type, id]);
 
   // 检查缓存中是否已有该图片
   const cachedData = useMemo(() => {
+    if (id === 0) return null;
     return imageCache.get(cacheKey) || null;
-  }, [cacheKey]);
+  }, [cacheKey, id]);
 
-  // 图片 URL 状态
+  // 图片 URL 状态（即使 id === 0 也要调用，保持 Hooks 调用顺序一致）
   const [imageData, setImageData] = useState<string | null>(cachedData);
-  const [isLoading, setIsLoading] = useState(!cachedData);
+  const [isLoading, setIsLoading] = useState(id === 0 ? false : !cachedData);
   const [hasError, setHasError] = useState(false);
 
   // 加载图片
   useEffect(() => {
+    // 如果 id 为 0，不加载
+    if (id === 0) {
+      setImageData(null);
+      setIsLoading(false);
+      setHasError(false);
+      return;
+    }
+
     // 如果缓存中已有，直接使用
     if (cachedData) {
       setImageData(cachedData);
@@ -192,6 +190,18 @@ export default function AssetImage({
       cancelled = true;
     };
   }, [id, type, cacheKey, cachedData]);
+
+  // 如果 id 为 0，显示空的占位元素
+  if (id === 0) {
+    return (
+      <div
+        className={cn("bg-muted/30 border-none", className)}
+        style={{ border: "none", outline: "none" }}
+        aria-label={alt || "空"}
+        {...props}
+      />
+    );
+  }
 
   // 如果图片加载中或加载失败，显示空的占位元素（保持大小）
   if (isLoading || hasError || !imageData) {

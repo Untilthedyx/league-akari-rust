@@ -2,11 +2,11 @@ import { invoke } from "@tauri-apps/api/core";
 
 // Rust 返回的原始数据结构（date 是时间戳字符串）
 export interface RecordItem {
-  gameId: string;       // 游戏 ID
-  puuid: string;        // 玩家 ID
+  gameId: string; // 游戏 ID
+  puuid: string; // 玩家 ID
   gameCreation: number; // 游戏创建时间（毫秒时间戳）
-  duration: number;     // 游戏时长（秒）
-  queueId: number;      // 队列ID(游戏模式)
+  duration: number; // 游戏时长（秒）
+  queueId: number; // 队列ID(游戏模式)
   participants: Participant[];
 }
 
@@ -35,7 +35,7 @@ export interface Participant {
   damageTakenPercentage: number;
   heal: number;
   healPercentage: number;
-  
+
   // KDA
   kills: number;
   deaths: number;
@@ -48,13 +48,16 @@ interface Item {
   name: string;
 }
 
-
-
-export async function getRecordList(puuid: string, begIndex: number, endIndex: number): Promise<RecordItem[]> {
-  console.log(puuid, begIndex, endIndex);
+export async function getRecordList(
+  puuid: string,
+  begIndex: number,
+  endIndex: number
+): Promise<RecordItem[]> {
   try {
     const recordListRaw = await invoke<RecordItem[]>("get_rank_list", {
-      puuid, begIndex, endIndex
+      puuid,
+      begIndex,
+      endIndex,
     });
     return recordListRaw;
   } catch (error) {

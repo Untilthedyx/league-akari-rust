@@ -19,17 +19,17 @@ impl RankedHttpApi {
     }
 
     /// 修正：获取 puuid 的排位信息
-    pub async fn get_ranked_stats(&self, puuid: &String) -> Result<RankedStats, HttpError> {
+    pub async fn get_ranked_stats(&self, puuid: &str) -> Result<RankedStats, HttpError> {
         let url = format!("/lol-ranked/v1/ranked-stats/{}", puuid);
         self.client.get(&url).await
     }
 
-    pub async fn acknowledge_eos_notification(&self, id: &String) -> Result<(), HttpError> {
+    pub async fn acknowledge_eos_notification(&self, id: &str) -> Result<(), HttpError> {
         let url = format!("/lol-ranked/v1/eos-notifications/{}/acknowledge", id);
         self.client.post(&url, None::<&()>).await
     }
 
-    pub async fn acknowledge_notification(&self, id: &String) -> Result<(), HttpError> {
+    pub async fn acknowledge_notification(&self, id: &str) -> Result<(), HttpError> {
         let url = format!("/lol-ranked/v1/notifications/{}/acknowledge", id);
         self.client.post(&url, None::<&()>).await
     }

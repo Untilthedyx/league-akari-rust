@@ -6,6 +6,7 @@ import RecordList from "@/components/RecordList";
 import type { RecordItem } from "@/lib/api/recordList";
 import { getRecordList } from "@/lib/api/recordList";
 import { getInfo } from "@/lib/api/info";
+import { useInitStore } from "@/lib/store/initStore";
 
 export default function RecordQuery() {
   const [playerInfo, setPlayerInfo] = useState<PlayerInfoData>();
@@ -14,12 +15,18 @@ export default function RecordQuery() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const currentIndexRef = useRef(0);
+  const puuid = useInitStore((state) => state.summoner?.puuid);
+
+  if (!puuid) {
+    return <div>Loading...</div>;
+  }
 
   useEffect(() => {
-    getInfo().then((info) => {
+    getInfo(puuid).then((info) => {
       setPlayerInfo(info);
+      useInitStore.getState().setFilterHeroes(info.favoriteHeroes);
     });
-  }, []);
+  }, [puuid]);
 
   // 加载更多战绩
   const loadMoreRecords = useCallback(async () => {
@@ -31,7 +38,7 @@ export default function RecordQuery() {
       const endIndex = begIndex + 19;
 
       const newRecords = await getRecordList(
-        "55cc79c4-3d20-535a-9bff-00b1867534d8",
+        puuid,
         begIndex,
         endIndex
       );
@@ -131,7 +138,7 @@ export default function RecordQuery() {
     // 根据 hero 筛选
     if (filters.hero) {
       filtered = filtered.filter(
-        (item) => item.participant.champion.name === filters.hero
+        (item) => item.participant.champion.id === Number(filters.hero)
       );
     }
 
@@ -165,7 +172,6 @@ export default function RecordQuery() {
           {/* 筛选模块 */}
           <div className="mb-5 shrink-0">
             <RecordFilter
-              records={records}
               onFilterChange={handleFilterChange}
             />
           </div>

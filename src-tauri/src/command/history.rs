@@ -1,5 +1,6 @@
 use crate::shared::web_api::record_sgp::{get_record_list, RecordItem};
 use tauri::Runtime;
+use tracing::info;
 
 /// 获取召唤师头像图标（Base64 编码）
 ///
@@ -14,8 +15,9 @@ pub async fn get_rank_list<R: Runtime>(
     _app: tauri::AppHandle<R>,
     _window: tauri::Window<R>,
     puuid: &str,
-    beg_index: Option<i32>,
-    end_index: Option<i32>,
+    beg_index: i32,
+    end_index: i32,
 ) -> Result<Vec<RecordItem>, String> {
-    get_record_list(puuid, beg_index.unwrap_or(0), end_index.unwrap_or(19)).await
+    info!("get_rank_list: puuid: {}, beg_index: {}, end_index: {}", puuid, beg_index, end_index);
+    get_record_list(puuid, beg_index, end_index).await
 }

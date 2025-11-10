@@ -33,8 +33,8 @@ pub struct FavoriteHero {
     pub matches: i64,
 }
 
-pub async fn get_summoner_info(client: &LcuApi, info: &mut Info) {
-    let summoner_info = client.summoner.get_current_summoner().await.unwrap();
+pub async fn get_summoner_info(client: &LcuApi, info: &mut Info, puuid: &str) {
+    let summoner_info = client.summoner.get_summoner_by_puuid(puuid).await.unwrap();
     info.puuid = summoner_info.puuid;
     info.game_name = format!("{}#{}", summoner_info.game_name, summoner_info.tag_line);
     info.game_level = summoner_info.summoner_level;
@@ -42,8 +42,8 @@ pub async fn get_summoner_info(client: &LcuApi, info: &mut Info) {
 }
 
 /// must make sure the client is initialized
-pub async fn get_rank_info(client: &LcuApi, info: &mut Info) {
-    let ranked = client.ranked.get_ranked_stats(&info.puuid).await.unwrap();
+pub async fn get_rank_info(client: &LcuApi, info: &mut Info, puuid: &str) {
+    let ranked = client.ranked.get_ranked_stats(puuid).await.unwrap();
     info.highest_rank = RankInfo {
         rank: ranked.highest_ranked_entry.highest_tier,
         division: ranked.highest_ranked_entry.highest_division,
@@ -67,11 +67,11 @@ pub async fn get_rank_info(client: &LcuApi, info: &mut Info) {
     };
 }
 
-pub async fn get_champion_mastery_info(client: &LcuApi, info: &mut Info) {
+pub async fn get_champion_mastery_info(client: &LcuApi, info: &mut Info, puuid: &str) {
     let champion_info_cache = get_champion_info_cache().await;
     let champion_mastery = client
         .champion_mastery
-        .get_player_champion_mastery(&info.puuid)
+        .get_player_champion_mastery(puuid)
         .await
         .unwrap();
 
@@ -88,11 +88,11 @@ pub async fn get_champion_mastery_info(client: &LcuApi, info: &mut Info) {
     }
 }
 
-pub async fn get_info() -> Result<Info, String> {
+pub async fn get_info(puuid: &str) -> Result<Info, String> {
     let client = get_lcu_client().await.unwrap();
     let mut info = Info::default();
-    get_summoner_info(&client, &mut info).await;
-    get_rank_info(&client, &mut info).await;
-    get_champion_mastery_info(&client, &mut info).await;
+    get_summoner_info(&client, &mut info, puuid).await;
+    get_rank_info(&client, &mut info, puuid).await;
+    get_champion_mastery_info(&client, &mut info, puuid).await;
     Ok(info)
 }

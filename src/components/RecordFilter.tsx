@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { RotateCcw } from "lucide-react";
 import { Button } from "./ui/button";
 import { SearchableSelect, SelectOption } from "./ui/searchable-select";
-import type { RecordItem } from "@/lib/api/recordList";
+import { useInitStore } from "@/lib/store/initStore";
 
 export interface FilterOptions {
   queueId?: number;
@@ -13,34 +13,31 @@ export interface FilterOptions {
 }
 
 export default function RecordFilter({
-  records,
   onFilterChange,
 }: {
-  records: RecordItem[];
   onFilterChange: (filters: FilterOptions) => void;
 }) {
   const { t } = useTranslation();
   const [filters, setFilters] = useState<FilterOptions>({});
 
-  // 游戏模式选项（从 records 中提取唯一的 queueId）
   const gameModeOptions: SelectOption[] = useMemo(() => {
-    const options: SelectOption[] = [
-      { value: "", label: t("filter.all") },
-    ];
-
-    const uniqueQueueIds = Array.from(
-      new Set(records.map((record) => record.queueId))
-    ).sort((a, b) => a - b);
-
-    uniqueQueueIds.forEach((queueId) => {
-      options.push({
-        value: queueId.toString(),
-        label: t(`queue.${queueId}`, { defaultValue: t("queue.other") }),
-      });
-    });
-
+    const options: SelectOption[] = [{ value: "", label: t("filter.all") }];
+    options.push({ value: "420", label: t("queue.420") });
+    options.push({ value: "430", label: t("queue.430") });
+    options.push({ value: "440", label: t("queue.440") });
+    options.push({ value: "450", label: t("queue.450") });
+    options.push({ value: "480", label: t("queue.480") });
+    options.push({ value: "490", label: t("queue.490") });
+    options.push({ value: "890", label: t("queue.890") });
+    options.push({ value: "900", label: t("queue.900") });
+    options.push({ value: "1700", label: t("queue.1700") });
+    options.push({ value: "1900", label: t("queue.1900") });
+    options.push({ value: "2300", label: t("queue.2300") });
+    options.push({ value: "2400", label: t("queue.2400") });
+    options.push({ value: "3100", label: t("queue.3100") });
+    options.push({ value: "other", label: t("queue.other") });
     return options;
-  }, [records, t]);
+  }, [t]);
 
   // 胜负选项
   const winOptions: SelectOption[] = useMemo(
@@ -49,7 +46,7 @@ export default function RecordFilter({
       { value: "true", label: t("common.win") },
       { value: "false", label: t("common.defeat") },
     ],
-    []
+    [t]
   );
 
   // MVP选项
@@ -60,40 +57,21 @@ export default function RecordFilter({
       { value: "svp", label: t("common.svp") },
       { value: "other", label: t("common.other") },
     ],
-    []
+    [t]
   );
 
   // 英雄列表（从 records 的所有 participants 中提取唯一的英雄名称，根据 puuid 筛选）
+  const filterHeroes = useInitStore((state) => state.filterHeroes);
   const heroOptions: SelectOption[] = useMemo(() => {
-    const options: SelectOption[] = [
-      { value: "", label: t("filter.all") },
-    ];
-
-    // 从所有 records 的所有 participants 中，找到与 record.puuid 匹配的 participant
-    // 然后提取唯一的英雄名称
-    const uniqueHeroes = Array.from(
-      new Set(
-        records
-          .map((record) => {
-            // 找到与 record.puuid 匹配的 participant
-            const participant = record.participants.find(
-              (p) => p.puuid === record.puuid
-            );
-            return participant?.champion.name;
-          })
-          .filter((name): name is string => !!name) // 过滤掉 undefined
-      )
-    ).sort();
-
-    uniqueHeroes.forEach((hero) => {
+    const options: SelectOption[] = [{ value: "", label: t("filter.all") }];
+    filterHeroes.forEach((hero) => {
       options.push({
-        value: hero,
-        label: hero,
+        value: hero.championId.toString(),
+        label: hero.championName,
       });
     });
-
     return options;
-  }, [records, t]);
+  }, [filterHeroes, t]);
 
   const handleGameModeChange = (value: string) => {
     const newFilters = {
@@ -174,7 +152,7 @@ export default function RecordFilter({
         options={heroOptions}
         value={filters.hero || ""}
         onChange={handleHeroChange}
-        placeholder={t("filter.selectHero")}
+        placeholder={t("filter.allHero")}
         className="w-[140px]"
       />
 

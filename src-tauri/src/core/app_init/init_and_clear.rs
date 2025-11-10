@@ -9,24 +9,45 @@ use crate::shared::init::lcu::get_lcu_client;
 use crate::shared::init::lcu::{clear_lcu_client, init_lcu_client};
 use crate::shared::init::process::{clear_process_info, init_process_info};
 use crate::shared::init::sgp::{clear_sgp_client, init_sgp_client};
+use crate::shared::types::league_client::summoner::SummonerInfo;
 use crate::utils::error::init_error::InitError;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter};
 use tokio::time::{sleep, Duration};
 use tracing::{info, warn};
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct InitStatus {
+    pub summoner: Option<Summoner>,
     pub initialized: bool,
     pub message: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct Summoner {
+    pub puuid: String,
+}
+
+pub fn parse_summoner(summoner: &SummonerInfo) -> Option<Summoner> {
+    Some(Summoner {
+        puuid: summoner.puuid.clone(),
+    })
+}
+
 /// 发送初始化状态事件
-fn emit_init_status(app_handle: &Option<AppHandle>, initialized: bool, message: &str) {
+fn emit_init_status(
+    app_handle: &Option<AppHandle>,
+    initialized: bool,
+    message: &str,
+    summoner: Option<Summoner>,
+) {
     if let Some(handle) = app_handle {
         let _ = handle.emit(
             "init-status",
             InitStatus {
+                summoner: summoner,
                 initialized,
                 message: message.to_string(),
             },
@@ -56,33 +77,30 @@ where
 
 pub async fn wait_client_ready(app_handle: &Option<AppHandle>) {
     let mut i = 1;
-    emit_init_status(&app_handle, false, "等待客户端就绪...");
+    emit_init_status(&app_handle, false, "等待客户端就绪...", None);
     loop {
         let client = get_lcu_client().await.unwrap();
         if client.summoner.get_current_summoner().await.is_ok() {
+            let summoner = client.summoner.get_current_summoner().await.unwrap();
+            emit_init_status(&app_handle, true, "客户端就绪", parse_summoner(&summoner));
             break;
         }
         tokio::time::sleep(Duration::from_secs(1)).await;
         info!("等待客户端就绪: 已经等待了 {} 秒", i);
-        emit_init_status(
-            &app_handle,
-            false,
-            &format!("等待客户端就绪: 已经等待了 {} 秒", i),
-        );
         i += 1;
     }
-    emit_init_status(&app_handle, true, "客户端就绪");
+    emit_init_status(&app_handle, true, "客户端就绪", None);
 }
 
 pub async fn init_state(app_handle: Option<AppHandle>) {
     info!("正在初始化进程信息...");
-    emit_init_status(&app_handle, false, "正在初始化进程信息...");
+    emit_init_status(&app_handle, false, "正在初始化进程信息...", None);
     init_process_info().await.unwrap();
     info!("正在初始化 LCU 客户端...");
-    emit_init_status(&app_handle, false, "正在初始化 LCU 客户端...");
+    emit_init_status(&app_handle, false, "正在初始化 LCU 客户端...", None);
     init_lcu_client().await.unwrap();
     info!("正在初始化 SGP 客户端...");
-    emit_init_status(&app_handle, false, "正在初始化 SGP 客户端...");
+    emit_init_status(&app_handle, false, "正在初始化 SGP 客户端...", None);
     init_sgp_client().await.unwrap();
 
     // 等待 客户端 初始化完成
@@ -91,30 +109,30 @@ pub async fn init_state(app_handle: Option<AppHandle>) {
     info!("客户端就绪");
 
     info!("正在初始化召唤师技能图标缓存...");
-    emit_init_status(&app_handle, false, "正在初始化召唤师技能图标缓存...");
+    emit_init_status(&app_handle, false, "正在初始化召唤师技能图标缓存...", None);
     retry_with_delay(|| init_spell_info_cache(), "召唤师技能图标缓存").await;
 
     info!("正在初始化符文图标缓存...");
-    emit_init_status(&app_handle, false, "正在初始化符文图标缓存...");
+    emit_init_status(&app_handle, false, "正在初始化符文图标缓存...", None);
     retry_with_delay(|| init_perk_info_cache(), "符文图标缓存").await;
 
     info!("正在初始化英雄图标缓存...");
-    emit_init_status(&app_handle, false, "正在初始化英雄图标缓存...");
+    emit_init_status(&app_handle, false, "正在初始化英雄图标缓存...", None);
     retry_with_delay(|| init_champion_info_cache(), "英雄图标缓存").await;
 
     info!("正在初始化物品图标缓存...");
-    emit_init_status(&app_handle, false, "正在初始化物品图标缓存...");
+    emit_init_status(&app_handle, false, "正在初始化物品图标缓存...", None);
     retry_with_delay(|| init_item_info_cache(), "物品图标缓存").await;
 
     // 发送初始化完成事件
     info!("初始化完成");
-    emit_init_status(&app_handle, true, "初始化完成");
+    emit_init_status(&app_handle, true, "初始化完成", None);
 }
 
 pub async fn clear_state(app_handle: Option<AppHandle>) {
     info!("正在清除状态...");
-    emit_init_status(&app_handle, false, "正在清除状态...");
-    
+    emit_init_status(&app_handle, false, "正在清除状态...", None);
+
     info!("正在清除进程信息...");
     clear_process_info().await;
     info!("正在清除 LCU 客户端...");
@@ -129,7 +147,7 @@ pub async fn clear_state(app_handle: Option<AppHandle>) {
     clear_perk_info_cache().await;
     info!("正在清除英雄图标缓存...");
     clear_champion_info_cache().await;
-    
+
     info!("清除完成");
-    emit_init_status(&app_handle, false, "状态已清除，等待重新初始化...");
+    emit_init_status(&app_handle, false, "状态已清除，等待重新初始化...", None);
 }

@@ -24,14 +24,21 @@ export interface PlayerInfoData {
     losses?: number;
   };
 
-  favoriteHeroes: Array<{
-    championId: number;
-    championName: string;
-    matches: number;
-  }>;
+  favoriteHeroes: Array<FavoriteHero>;
 }
 
-export async function getInfo(): Promise<PlayerInfoData> {
-  console.log("getInfo");
-  return invoke<PlayerInfoData>("get_info");
+export interface FavoriteHero {
+  championId: number;
+  championName: string;
+  matches: number;
+}
+
+export async function getInfo(puuid: string): Promise<PlayerInfoData> {
+  try {
+    const playerInfo = await invoke<PlayerInfoData>("get_info", { puuid });
+    return playerInfo;
+  } catch (error) {
+    console.error("获取玩家信息失败:", error);
+    throw error;
+  }
 }
