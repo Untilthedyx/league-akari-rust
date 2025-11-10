@@ -4,6 +4,14 @@
 
 ## 如何构建
 
+1. 安装本地项目依赖
+
+```cmd
+npm install @tauri-apps/cli --save-dev
+```
+
+2. 打包构建
+
 ```cmd
 npm run tauri dev
 npm run tauri build --release
