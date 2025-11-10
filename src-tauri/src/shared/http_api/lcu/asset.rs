@@ -27,7 +27,7 @@ impl AssetHttpApi {
     /// - Base64 编码的图片数据 URL，可直接用于 `<img src="...">`
     /// - 格式：`data:image/jpeg;base64,...`
     ///
-    pub async fn get_profile_icon_base64(&self, icon_id: u32) -> Result<String, HttpError> {
+    pub async fn get_profile_icon_base64(&self, icon_id: i64) -> Result<String, HttpError> {
         let uri = format!("/lol-game-data/assets/v1/profile-icons/{}.jpg", icon_id);
         self.get_image_as_base64(&uri).await
     }
@@ -39,10 +39,10 @@ impl AssetHttpApi {
     ///
     /// # 返回
     /// - Base64 编码的图片数据 URL
-    pub async fn get_champion_icon_base64(&self, champion_id: u32) -> Result<String, HttpError> {
+    pub async fn get_champion_icon_base64(&self, champion_id: i64) -> Result<String, HttpError> {
         let cache = get_champion_info_cache().await;
         let item = cache
-            .get(&champion_id.to_string())
+            .get(&champion_id)
             .ok_or_else(|| HttpError::NotFound(format!("未找到英雄图标: {}", champion_id)))?;
 
         self.get_image_as_base64(&item.icon_path.as_str()).await
@@ -59,13 +59,13 @@ impl AssetHttpApi {
     /// # 性能优化
     /// - 使用全局缓存存储图标 URL 路径（避免一次性加载所有图片）
     /// - 按需将 URL 转换为 base64，只在需要时才加载图片数据
-    pub async fn get_item_icon_base64(&self, item_id: u32) -> Result<String, HttpError> {
+    pub async fn get_item_icon_base64(&self, item_id: i64) -> Result<String, HttpError> {
         // 获取或初始化 URL 缓存
         let cache = get_item_info_cache().await;
 
         // 从缓存获取图标路径
         let item = cache
-            .get(&item_id.to_string())
+            .get(&item_id)
             .ok_or_else(|| HttpError::NotFound(format!("未找到物品图标: {}", item_id)))?;
 
         // 按需转换为 base64
@@ -83,13 +83,13 @@ impl AssetHttpApi {
     /// # 性能优化
     /// - 使用全局缓存存储图标 URL 路径（避免一次性加载所有图片）
     /// - 按需将 URL 转换为 base64，只在需要时才加载图片数据
-    pub async fn get_spell_icon_base64(&self, spell_id: &str) -> Result<String, HttpError> {
+    pub async fn get_spell_icon_base64(&self, spell_id: i64) -> Result<String, HttpError> {
         // 获取或初始化 URL 缓存
         let cache = get_spell_info_cache().await;
 
         // 从缓存获取图标路径
         let spell = cache
-            .get(spell_id)
+            .get(&spell_id)
             .ok_or_else(|| HttpError::NotFound(format!("未找到召唤师技能图标: {}", spell_id)))?;
 
         // 按需转换为 base64
@@ -107,13 +107,13 @@ impl AssetHttpApi {
     /// # 性能优化
     /// - 使用全局缓存存储图标 URL 路径（避免一次性加载所有图片）
     /// - 按需将 URL 转换为 base64，只在需要时才加载图片数据
-    pub async fn get_perk_icon_base64(&self, perk_id: &str) -> Result<String, HttpError> {
+    pub async fn get_perk_icon_base64(&self, perk_id: i64) -> Result<String, HttpError> {
         // 获取或初始化 URL 缓存
         let cache = get_perk_info_cache().await;
 
         // 从缓存获取图标路径
         let item = cache
-            .get(perk_id)
+            .get(&perk_id)
             .ok_or_else(|| HttpError::NotFound(format!("未找到符文图标: {}", perk_id)))?;
 
         // 按需转换为 base64

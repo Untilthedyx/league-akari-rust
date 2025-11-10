@@ -122,7 +122,7 @@ const RecordItemComponent = memo(
                   <TooltipTrigger asChild>
                     <div className="relative overflow-hidden rounded">
                       <AssetImage
-                        id={participant.champion.id.toString()}
+                        id={participant.champion.id}
                         type="champion"
                         alt={participant.champion.name}
                         className="w-12 h-12 object-cover"
@@ -196,7 +196,7 @@ const RecordItemComponent = memo(
                         <TooltipTrigger asChild>
                           <div>
                             <AssetImage
-                              id={perk.id.toString()}
+                              id={perk.id}
                               type="perk"
                               alt={perk.name}
                               className="w-7 h-7 rounded object-cover shrink-0"
@@ -213,7 +213,7 @@ const RecordItemComponent = memo(
                         <TooltipTrigger asChild>
                           <div>
                             <AssetImage
-                              id={spell.id.toString()}
+                              id={spell.id}
                               type="spell"
                               alt={spell.name}
                               className="w-7 h-7 rounded object-cover shrink-0"
@@ -235,7 +235,7 @@ const RecordItemComponent = memo(
                       <TooltipTrigger asChild>
                         <div>
                           <AssetImage
-                            id={item.id.toString()}
+                            id={item.id}
                             type="item"
                             alt={item.name}
                             className="w-7 h-7 rounded object-cover shrink-0"
@@ -252,7 +252,7 @@ const RecordItemComponent = memo(
                       <TooltipTrigger asChild>
                         <div>
                           <AssetImage
-                            id={participant.items[6].id.toString()}
+                            id={participant.items[6].id}
                             type="item"
                             alt={participant.items[6].name}
                             className="w-7 h-7 rounded object-cover shrink-0"
@@ -337,7 +337,7 @@ const RecordItemComponent = memo(
                         <TooltipTrigger asChild>
                           <div className="flex items-center gap-1 h-full group cursor-pointer shrink-0">
                             <AssetImage
-                              id={player.champion.id.toString()}
+                              id={player.champion.id}
                               type="champion"
                               alt={player.champion.name}
                               className="w-7 h-7 rounded object-cover shrink-0"
@@ -367,7 +367,7 @@ const RecordItemComponent = memo(
                         <TooltipTrigger asChild>
                           <div className="flex items-center gap-1 h-full group cursor-pointer shrink-0">
                             <AssetImage
-                              id={enemy.champion.id.toString()}
+                              id={enemy.champion.id}
                               type="champion"
                               alt={enemy.champion.name}
                               className="w-7 h-7 rounded object-cover shrink-0"

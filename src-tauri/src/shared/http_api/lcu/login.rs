@@ -16,7 +16,6 @@ impl LoginHttpApi {
         Self { client }
     }
 
-    /// 执行闪避操作（英雄选择阶段退出）
     pub async fn dodge(&self) -> Result<(), HttpError> {
         #[derive(Debug, Serialize)]
         struct LoginInvokeRequest {

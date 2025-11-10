@@ -8,14 +8,10 @@ use tokio;
 #[tokio::main]
 async fn main() {
     init_logger();
-    init_lcu_client().await.unwrap();
+    init_process_info().await.unwrap();
     init_lcu_client().await.unwrap();
     let client = get_lcu_client().await.unwrap();
-    let history = client
-        .match_history
-        .get_current_summoner_match_history()
-        .await
-        .unwrap();
-    println!("{:?}", serde_json::to_string(&history).unwrap());
+    let history = client.riotclient.get_token().await.unwrap();
+    println!("{:?}", history);
     tokio::signal::ctrl_c().await.unwrap();
 }

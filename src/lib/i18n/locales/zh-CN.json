@@ -45,6 +45,19 @@
     "result": "胜负筛选",
     "bestPlayer": "最佳筛选",
     "hero": "英雄筛选"
+  },
+  "tiers": {
+    "UNRANKED": "未定级",
+    "IRON": "坚韧黑铁",
+    "BRONZE": "英勇黄铜",
+    "SILVER": "不屈白银",
+    "GOLD": "荣耀黄金",
+    "PLATINUM": "华贵铂金",
+    "EMERALD": "流光翡翠",
+    "DIAMOND": "璀璨钻石",
+    "MASTER": "超凡大师",
+    "GRANDMASTER": "傲世宗师",
+    "CHALLENGER": "最强王者"
   }
 }
 

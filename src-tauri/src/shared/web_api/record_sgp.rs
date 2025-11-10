@@ -1,5 +1,3 @@
-use std::time::SystemTime;
-
 use crate::shared::init::game_data::get_champion_info_cache;
 use crate::shared::init::game_data::get_item_info_cache;
 use crate::shared::init::game_data::get_perk_info_cache;
@@ -63,7 +61,6 @@ pub async fn get_record_list(
     beg_index: i32,
     end_index: i32,
 ) -> Result<Vec<RecordItem>, String> {
-    let time = SystemTime::now();
     let client = match get_sgp_client().await {
         Ok(client) => client,
         Err(e) => return Err(e.to_string()),
@@ -191,7 +188,7 @@ pub async fn parse_participant(sgp_participant: &SgpParticipant) -> Participant 
             return "无装备".to_string(); // 空物品槽位
         }
         item_info
-            .get(&item_id.to_string())
+            .get(&item_id)
             .map(|item| item.name.clone())
             .unwrap_or_else(|| format!("未知物品({})", item_id))
     };
@@ -199,7 +196,7 @@ pub async fn parse_participant(sgp_participant: &SgpParticipant) -> Participant 
     // 辅助函数：安全获取英雄名称
     let get_champion_name = |champion_id: i64| -> String {
         champion_info
-            .get(&champion_id.to_string())
+            .get(&champion_id)
             .map(|champion| champion.name.clone())
             .unwrap_or_else(|| format!("未知英雄({})", champion_id))
     };
@@ -207,7 +204,7 @@ pub async fn parse_participant(sgp_participant: &SgpParticipant) -> Participant 
     // 辅助函数：安全获取技能名称
     let get_spell_name = |spell_id: i64| -> String {
         spell_info
-            .get(&spell_id.to_string())
+            .get(&spell_id)
             .map(|spell| spell.name.clone())
             .unwrap_or_else(|| format!("未知技能({})", spell_id))
     };
@@ -215,7 +212,7 @@ pub async fn parse_participant(sgp_participant: &SgpParticipant) -> Participant 
     // 辅助函数：安全获取符文名称
     let get_perk_name = |perk_id: i64| -> String {
         perk_info
-            .get(&perk_id.to_string())
+            .get(&perk_id)
             .map(|perk| perk.name.clone())
             .unwrap_or_else(|| format!("未知符文({})", perk_id))
     };

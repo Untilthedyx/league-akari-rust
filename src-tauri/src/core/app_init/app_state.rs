@@ -2,7 +2,7 @@ use crate::core::app_init::init_and_clear::{clear_state, init_state};
 use crate::shared::process::is_running;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
-use tauri::Manager;
+use tauri::{AppHandle, Manager};
 use tokio::sync::watch;
 use tokio::time::{interval, Duration};
 
@@ -21,8 +21,9 @@ pub fn app_setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>>
     app.manage(AppState::default());
     let app_handle = app.handle().clone();
     tauri::async_runtime::spawn(async move {
-        let app_state = app_handle.state::<AppState>();
-        app_state.init().await;
+        let app_handle_for_init = app_handle.clone();
+        let app_state = app_handle_for_init.state::<AppState>();
+        app_state.init(app_handle).await;
     });
     Ok(())
 }
@@ -51,9 +52,10 @@ impl AppState {
     }
 
     /// 初始化应用状态监控
-    pub async fn init(&self) {
+    pub async fn init(&self, app_handle: AppHandle) {
         // 克隆 receiver 以便在异步任务中使用
         let mut rx = self.open_receiver.as_ref().clone();
+        let app_handle_clone = app_handle.clone();
 
         tauri::async_runtime::spawn(async move {
             loop {
@@ -65,10 +67,10 @@ impl AppState {
 
                 if *rx.borrow() {
                     // open 变为 true，启动初始化流程
-                    init_state().await;
+                    init_state(Some(app_handle_clone.clone())).await;
                 } else {
                     // open 变为 false，清空初始化
-                    clear_state().await;
+                    clear_state(Some(app_handle_clone.clone())).await;
                 }
             }
         });

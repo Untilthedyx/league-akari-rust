@@ -19,7 +19,7 @@ import { useState, useEffect, useMemo } from "react";
  * <img src={avatarUrl} alt="头像" />
  * ```
  */
-export async function getProfileIcon(iconId: string): Promise<string> {
+export async function getProfileIcon(iconId: number): Promise<string> {
   try {
     const base64Url = await invoke<string>("get_profile_icon", {
       iconId: Number(iconId),
@@ -43,7 +43,7 @@ export async function getProfileIcon(iconId: string): Promise<string> {
  * <img src={championIcon} alt="英雄头像" />
  * ```
  */
-export async function getChampionIcon(championId: string): Promise<string> {
+export async function getChampionIcon(championId: number): Promise<string> {
   try {
     const base64Url = await invoke<string>("get_champion_icon", {
       championId: Number(championId),
@@ -67,7 +67,7 @@ export async function getChampionIcon(championId: string): Promise<string> {
  * <img src={itemIcon} alt="物品图标" />
  * ```
  */
-export async function getItemIcon(itemId: string): Promise<string> {
+export async function getItemIcon(itemId: number): Promise<string> {
   try {
     const base64Url = await invoke<string>("get_item_icon", {
       itemId: Number(itemId),
@@ -91,7 +91,7 @@ export async function getItemIcon(itemId: string): Promise<string> {
  * <img src={spellIcon} alt="召唤师技能" />
  * ```
  */
-export async function getSpellIcon(spellId: string): Promise<string> {
+export async function getSpellIcon(spellId: number): Promise<string> {
   try {
     const base64Url = await invoke<string>("get_spell_icon", { spellId });
     return base64Url;
@@ -113,7 +113,7 @@ export async function getSpellIcon(spellId: string): Promise<string> {
  * <img src={perkIcon} alt="符文图标" />
  * ```
  */
-export async function getPerkIcon(perkId: string): Promise<string> {
+export async function getPerkIcon(perkId: number): Promise<string> {
   try {
     const base64Url = await invoke<string>("get_perk_icon", { perkId });
     return base64Url;
@@ -136,7 +136,7 @@ export async function getPerkIcon(perkId: string): Promise<string> {
  * // images.get("3460") => "data:image/jpeg;base64,..."
  * ```
  */
-export async function batchGetImages<T extends string>(
+export async function batchGetImages<T extends number>(
   iconIds: T[],
   getFn: (id: T) => Promise<string>
 ): Promise<Map<T, string>> {
@@ -170,8 +170,8 @@ export async function batchGetImages<T extends string>(
  * @returns Promise<Map<string, string>> ID 到 Base64 URL 的映射
  */
 export async function batchGetProfileIcons(
-  iconIds: string[]
-): Promise<Map<string, string>> {
+  iconIds: number[]
+): Promise<Map<number, string>> {
   return batchGetImages(iconIds, getProfileIcon);
 }
 
@@ -182,8 +182,8 @@ export async function batchGetProfileIcons(
  * @returns Promise<Map<string, string>> ID 到 Base64 URL 的映射
  */
 export async function batchGetChampionIcons(
-  championIds: string[]
-): Promise<Map<string, string>> {
+  championIds: number[]
+): Promise<Map<number, string>> {
   return batchGetImages(championIds, getChampionIcon);
 }
 
@@ -262,7 +262,7 @@ export function useImage(fetchFn: () => Promise<string>) {
  * }
  * ```
  */
-export function useImages<T extends string>(
+export function useImages<T extends number>(
   iconIds: T[],
   getFn: (id: T) => Promise<string>
 ) {
@@ -272,9 +272,9 @@ export function useImages<T extends string>(
 
   // 使用 useMemo 生成稳定的 key 来比较数组
   const iconIdsKey = useMemo(() => {
-    const sorted = [...iconIds].sort((a, b) => a.localeCompare(b));
+    const sorted = [...iconIds].sort((a, b) => a - b);
     return JSON.stringify(sorted);
-  }, [iconIds.join(",")]);
+  }, [iconIds]);
 
   useEffect(() => {
     let cancelled = false;

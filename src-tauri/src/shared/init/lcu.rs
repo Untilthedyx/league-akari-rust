@@ -1,12 +1,12 @@
 use crate::shared::http_api::lcu::LcuApi;
-use crate::shared::process::get_client_info;
+use crate::shared::init::process::get_process_info;
 use crate::utils::error::init_error::InitError;
 use tokio::sync::RwLock;
 
 static LCU_CLIENT: RwLock<Option<LcuApi>> = RwLock::const_new(None);
 
 pub async fn init_lcu_client() -> Result<(), InitError> {
-    let info = get_client_info().map_err(|e| InitError::Init(e.to_string()))?;
+    let info = get_process_info().await?;
     let base_url = "https://127.0.0.1".to_string();
     // token = username:password
     let token = format!("riot:{}", info.auth_token);

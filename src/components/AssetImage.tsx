@@ -35,7 +35,7 @@ const loadingPromises = new Map<CacheKey, Promise<string>>();
  */
 export interface AssetImageProps {
   /** 图片 ID（字符串） */
-  id: string;
+  id: number;
   /** 图片类型 */
   type: ImageType;
   /** CSS 类名 */
@@ -53,7 +53,7 @@ export interface AssetImageProps {
  * @param type 图片类型
  * @returns Promise<string> 图片 URL
  */
-async function getImageData(id: string, type: ImageType): Promise<string> {
+async function getImageData(id: number, type: ImageType): Promise<string> {
   const cacheKey: CacheKey = `${type}:${id}`;
 
   // 1. 检查缓存
@@ -133,7 +133,7 @@ export default function AssetImage({
   alt = "",
   ...props
 }: AssetImageProps) {
-  if (id === "0") {
+  if (id === 0) {
     return (
       <div
         className={cn("bg-muted/30 border-none", className)}

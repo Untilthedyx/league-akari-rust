@@ -1,111 +1,25 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import PlayerInfo, { PlayerData } from "@/components/PlayerInfo";
+import PlayerInfo from "@/components/PlayerInfo";
+import type { PlayerInfoData } from "@/lib/api/info";
 import RecordFilter, { FilterOptions } from "@/components/RecordFilter";
 import RecordList from "@/components/RecordList";
 import type { RecordItem } from "@/lib/api/recordList";
 import { getRecordList } from "@/lib/api/recordList";
-
-// 模拟单个玩家数据
-const generateMockPlayer = (): PlayerData => {
-  return {
-    id: "1",
-    avatar: "3460",
-    name: "like",
-    playerId: "#85845",
-    level: 30,
-    soloRank: {
-      rank: "最强王者",
-      lp: 120,
-      wins: 68,
-    },
-    flexRank: {
-      rank: "流光翡翠",
-      lp: 80,
-      wins: 35,
-      losses: 18,
-    },
-    historyStats: {
-      avgKills: 8.5,
-      avgDeaths: 3.2,
-      avgAssists: 6.8,
-      avgKDA: 4.78,
-      avgGoldShare: 22.5,
-      rankedWins: 68,
-      rankedLosses: 35,
-      totalWins: 103,
-      totalLosses: 47,
-    },
-    favoriteHeroes: [
-      {
-        name: "李白",
-        avatar: "86",
-        matches: 45,
-      },
-      {
-        name: "韩信",
-        avatar: "87",
-        matches: 32,
-      },
-      {
-        name: "诸葛亮",
-        avatar: "88",
-        matches: 28,
-      },
-      {
-        name: "露娜",
-        avatar: "89",
-        matches: 22,
-      },
-      {
-        name: "花木兰",
-        avatar: "90",
-        matches: 18,
-      },
-    ],
-    recentTeammates: [
-      {
-        name: "计伯言",
-        playerId: "#85873",
-        rankedWins: 7,
-        rankedLosses: 12,
-        totalWins: 45,
-        totalLosses: 32,
-      },
-      {
-        name: "她已不再孤立无援",
-        playerId: "#59539",
-        rankedWins: 1,
-        rankedLosses: 1,
-        totalWins: 23,
-        totalLosses: 18,
-      },
-      {
-        name: "游戏高手",
-        playerId: "#12345",
-        rankedWins: 15,
-        rankedLosses: 8,
-        totalWins: 89,
-        totalLosses: 56,
-      },
-      {
-        name: "刺客之王",
-        playerId: "#67890",
-        rankedWins: 12,
-        rankedLosses: 10,
-        totalWins: 67,
-        totalLosses: 45,
-      },
-    ],
-  };
-};
+import { getInfo } from "@/lib/api/info";
 
 export default function RecordQuery() {
-  const [player] = useState<PlayerData>(generateMockPlayer());
+  const [playerInfo, setPlayerInfo] = useState<PlayerInfoData>();
   const [records, setRecords] = useState<RecordItem[]>([]);
   const [filters, setFilters] = useState<FilterOptions>({});
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const currentIndexRef = useRef(0);
+
+  useEffect(() => {
+    getInfo().then((info) => {
+      setPlayerInfo(info);
+    });
+  }, []);
 
   // 加载更多战绩
   const loadMoreRecords = useCallback(async () => {
@@ -125,8 +39,9 @@ export default function RecordQuery() {
       setRecords((prev) => {
         // 合并新数据，去重
         let records = [...prev, ...newRecords];
-        records = records.filter((record, index, self) =>
-          index === self.findIndex((t) => t.gameId === record.gameId)
+        records = records.filter(
+          (record, index, self) =>
+            index === self.findIndex((t) => t.gameId === record.gameId)
         );
         const totalLength = records.length;
 
@@ -134,7 +49,10 @@ export default function RecordQuery() {
         currentIndexRef.current = totalLength;
 
         // 如果返回的数据少于请求的数量，或者达到上限，标记为没有更多数据
-        if (newRecords.length === 0 || newRecords.length < (endIndex - begIndex + 1)) {
+        if (
+          newRecords.length === 0 ||
+          newRecords.length < endIndex - begIndex + 1
+        ) {
           setHasMore(false);
         }
 
@@ -156,7 +74,7 @@ export default function RecordQuery() {
       filters.win ||
       filters.mvp ||
       filters.hero;
-    
+
     if (!hasFilters) {
       return records;
     }
@@ -169,8 +87,13 @@ export default function RecordQuery() {
         );
         return { record, participant };
       })
-      .filter((item): item is { record: RecordItem; participant: NonNullable<typeof item.participant> } => 
-        item.participant !== undefined
+      .filter(
+        (
+          item
+        ): item is {
+          record: RecordItem;
+          participant: NonNullable<typeof item.participant>;
+        } => item.participant !== undefined
       );
 
     let filtered = recordsWithParticipant;
@@ -233,7 +156,7 @@ export default function RecordQuery() {
         {/* 左侧列：玩家信息 */}
         <div className="flex flex-col overflow-hidden w-player-info shrink-0">
           <div className="flex-1 overflow-hidden">
-            <PlayerInfo player={player} />
+            <PlayerInfo playerInfo={playerInfo} />
           </div>
         </div>
 

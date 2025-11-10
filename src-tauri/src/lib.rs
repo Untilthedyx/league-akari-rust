@@ -11,6 +11,8 @@ use crate::command::asset::{
     get_champion_icon, get_item_icon, get_perk_icon, get_profile_icon, get_spell_icon,
 };
 use crate::command::history::get_rank_list;
+use crate::command::info::get_info;
+use crate::command::init::check_init_status;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -25,6 +27,8 @@ pub fn run() {
             get_item_icon,
             get_spell_icon,
             get_perk_icon,
+            get_info,
+            check_init_status,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

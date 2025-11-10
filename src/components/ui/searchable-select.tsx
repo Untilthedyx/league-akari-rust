@@ -64,12 +64,7 @@ export function SearchableSelect({
     setSearchText("");
   };
 
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange("");
-    setSearchText("");
-    inputRef.current?.focus();
-  };
+
 
   return (
     <div ref={containerRef} className={cn("relative", className)}>

@@ -12,10 +12,19 @@ pub struct Item {
     pub icon_path: String,
 }
 
-static CHAMPION_ICONS_CACHE: RwLock<Option<Arc<HashMap<String, Item>>>> = RwLock::const_new(None);
-static ITEM_ICONS_CACHE: RwLock<Option<Arc<HashMap<String, Item>>>> = RwLock::const_new(None);
-static SPELL_ICONS_CACHE: RwLock<Option<Arc<HashMap<String, Item>>>> = RwLock::const_new(None);
-static PERK_ICONS_CACHE: RwLock<Option<Arc<HashMap<String, Item>>>> = RwLock::const_new(None);
+static CHAMPION_ICONS_CACHE: RwLock<Option<Arc<HashMap<i64, Item>>>> = RwLock::const_new(None);
+static ITEM_ICONS_CACHE: RwLock<Option<Arc<HashMap<i64, Item>>>> = RwLock::const_new(None);
+static SPELL_ICONS_CACHE: RwLock<Option<Arc<HashMap<i64, Item>>>> = RwLock::const_new(None);
+static PERK_ICONS_CACHE: RwLock<Option<Arc<HashMap<i64, Item>>>> = RwLock::const_new(None);
+
+/// 检查缓存是否已初始化
+pub async fn is_cache_initialized() -> bool {
+    let champion_ok = CHAMPION_ICONS_CACHE.read().await.is_some();
+    let item_ok = ITEM_ICONS_CACHE.read().await.is_some();
+    let spell_ok = SPELL_ICONS_CACHE.read().await.is_some();
+    let perk_ok = PERK_ICONS_CACHE.read().await.is_some();
+    champion_ok && item_ok && spell_ok && perk_ok
+}
 
 pub async fn init_champion_info_cache() -> Result<(), InitError> {
     let client = get_lcu_client()
@@ -29,7 +38,7 @@ pub async fn init_champion_info_cache() -> Result<(), InitError> {
     let mut champions_map = HashMap::new();
     for champion in champions {
         champions_map.insert(
-            champion.id.to_string(),
+            champion.id,
             Item {
                 id: champion.id,
                 name: champion.name,
@@ -42,7 +51,7 @@ pub async fn init_champion_info_cache() -> Result<(), InitError> {
     Ok(())
 }
 
-pub async fn get_champion_info_cache() -> Arc<HashMap<String, Item>> {
+pub async fn get_champion_info_cache() -> Arc<HashMap<i64, Item>> {
     let guard = CHAMPION_ICONS_CACHE.read().await;
     guard
         .as_ref()
@@ -67,7 +76,7 @@ pub async fn init_item_info_cache() -> Result<(), InitError> {
     let mut items_map = HashMap::new();
     for item in items {
         items_map.insert(
-            item.id.to_string(),
+            item.id,
             Item {
                 id: item.id,
                 name: item.name,
@@ -85,7 +94,7 @@ pub async fn init_item_info_cache() -> Result<(), InitError> {
 /// # 返回
 /// - `Ok(Arc<HashMap<String, Item>>)`: 缓存的 Arc 引用（只克隆 Arc 指针，不克隆 HashMap）
 /// - `Err(InitError)`: 缓存未初始化时返回错误
-pub async fn get_item_info_cache() -> Arc<HashMap<String, Item>> {
+pub async fn get_item_info_cache() -> Arc<HashMap<i64, Item>> {
     let guard = ITEM_ICONS_CACHE.read().await;
     guard
         .as_ref()
@@ -110,7 +119,7 @@ pub async fn init_spell_info_cache() -> Result<(), InitError> {
     let mut spells_map = HashMap::new();
     for spell in spells {
         spells_map.insert(
-            spell.id.to_string(),
+            spell.id,
             Item {
                 id: spell.id,
                 name: spell.name,
@@ -128,7 +137,7 @@ pub async fn init_spell_info_cache() -> Result<(), InitError> {
 /// # 返回
 /// - `Ok(Arc<HashMap<String, Item>>)`: 缓存的 Arc 引用（只克隆 Arc 指针，不克隆 HashMap）
 /// - `Err(InitError)`: 缓存未初始化时返回错误
-pub async fn get_spell_info_cache() -> Arc<HashMap<String, Item>> {
+pub async fn get_spell_info_cache() -> Arc<HashMap<i64, Item>> {
     let guard = SPELL_ICONS_CACHE.read().await;
     guard
         .as_ref()
@@ -153,7 +162,7 @@ pub async fn init_perk_info_cache() -> Result<(), InitError> {
     let mut perks_map = HashMap::new();
     for perk in perks {
         perks_map.insert(
-            perk.id.to_string(),
+            perk.id,
             Item {
                 id: perk.id,
                 name: perk.name,
@@ -171,7 +180,7 @@ pub async fn init_perk_info_cache() -> Result<(), InitError> {
 /// # 返回
 /// - `Ok(Arc<HashMap<String, Item>>)`: 缓存的 Arc 引用（只克隆 Arc 指针，不克隆 HashMap）
 /// - `Err(InitError)`: 缓存未初始化时返回错误
-pub async fn get_perk_info_cache() -> Arc<HashMap<String, Item>> {
+pub async fn get_perk_info_cache() -> Arc<HashMap<i64, Item>> {
     let guard = PERK_ICONS_CACHE.read().await;
     guard
         .as_ref()

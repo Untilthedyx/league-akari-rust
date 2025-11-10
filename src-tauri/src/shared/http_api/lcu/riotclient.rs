@@ -36,4 +36,9 @@ impl RiotClientHttpApi {
         let url = "/riotclient/splash";
         self.client.put(url, None::<&()>).await
     }
+
+    pub async fn get_token(&self) -> Result<String, HttpError> {
+        let url = "/riotclient/auth-token";
+        self.client.get(url).await
+    }
 }
